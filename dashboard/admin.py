@@ -5,6 +5,7 @@ from django import forms
 from django.utils.html import format_html
 from django.db.models import OuterRef, Subquery
 from django.db.models import Max, F, ExpressionWrapper, fields, Q
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class ClientInline(admin.TabularInline):
@@ -39,12 +40,26 @@ class TrashAdmin(admin.ModelAdmin):
 
 
 
-from django.db.models import OuterRef, Subquery
+
 
 @admin.register(room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('HouseOwner_colored', 'RoomNo_colored', 'display_fee', 'status_colored', 'remark_colored')
+    list_display = ('display_HouseOwner', 'display_RoomNo', 'display_fee', 'status_colored', 'display_remark', 'get_client_name')
     actions = ['make_available', 'make_in_use']
+    list_filter = ('status',)
+
+    def display_remark(self, obj):
+        return f'{obj.remark}' if obj.remark else ''
+    display_remark.short_description = 'Remark / ចំណាំ'
+
+    def display_HouseOwner(self, obj):
+        return f'{obj.HouseOwner.name}' if obj.HouseOwner else ''
+    display_HouseOwner.short_description = 'House Owner / ម្ចាស់ផ្ទះ'
+
+    def display_RoomNo(self, obj):
+        return f'{obj.RoomNo}' if obj.RoomNo else ''
+    display_RoomNo.short_description = 'Room Number / លេខបន្ទប់'
+
 
     def display_fee(self, obj):
         return f'${obj.RoomFee:.0f}'
@@ -76,37 +91,12 @@ class RoomAdmin(admin.ModelAdmin):
     make_available.short_description = 'Set selected rooms as Available/ទំនេរ'
     make_in_use.short_description = 'Set selected rooms as In-use/កំពុង​ប្រើ'
 
-    def HouseOwner_colored(self, obj):
-        # Replace 'HouseOwner' with the actual field name in your model
-        return format_html(
-            '<span style="display: inline-block; width: 130px; text-align:center;">{}</span>',
-            obj.HouseOwner,
-        )
+    def get_client_name(self, obj):
+        if obj.status == 'In-use/កំពុង​ប្រើ' and obj.checkins.exists():
+            return obj.checkins.last().client_name
+        return ''
 
-    HouseOwner_colored.short_description = 'House Owner / ម្ចាស់ផ្ទះ'
-
-    def RoomNo_colored(self, obj):
-        # Replace 'RoomNo' with the actual field name in your model
-        return format_html(
-            '<span style="display: inline-block; width: 130px; text-align:center;">{}</span>',
-            obj.RoomNo,
-        )
-
-    RoomNo_colored.short_description = 'Room Number / លេខបន្ទប់'
-
-    def remark_colored(self, obj):
-        # Replace 'remark' with the actual field name in your model
-        return format_html(
-            '<span style="display: inline-block; width: 130px; text-align:center;">{}</span>',
-            obj.remark,
-        )
-
-    remark_colored.short_description = 'Remark / សំគាល់'
-
-
-
-
-
+    get_client_name.short_description = 'Client Name / ឈ្មោះអតិថិជន'
 
 
 
@@ -157,3 +147,109 @@ class CheckOutAdmin(admin.ModelAdmin):
 
     RoomNo.short_description = 'Room No'
     status.short_description = 'Status'
+
+
+class MonthlyRentalFeeForm(forms.ModelForm):
+    room_status = forms.CharField(label='Room Status', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
+    class Meta:
+        model = MonthlyRentalFee
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        try:
+            # Attempt to get the room status
+            room_status = self.instance.room.status
+        except ObjectDoesNotExist:
+            # If room is not associated, set room status to 'N/A'
+            room_status = 'N/A'
+
+        self.fields['room_status'].initial = room_status
+
+@admin.register(utilities)
+class UtilitiesAdmin(admin.ModelAdmin):
+    list_display = ('room', 'previous_water', 'other_fee', 'remark')
+
+
+@admin.register(MonthlyRentalFee)
+class MonthlyRentalFeeAdmin(admin.ModelAdmin):
+    list_display = (
+        'checkin_client_name',
+        'room_no',
+        'house_owner',
+        'formatted_previous_water',
+        'formatted_current_water',
+        'formatted_water_fee',
+        'formatted_trash_price',
+        'formatted_parking_fee',
+        'formatted_room_fee',
+        'formatted_sub_total',
+    )
+
+    list_filter = ('checkin__room__HouseOwner',)
+
+    def checkin_client_name(self, obj):
+        return obj.checkin.client_name if obj.checkin else ''
+    
+    checkin_client_name.short_description = 'CheckIn Client Name'
+
+    def room_no(self, obj):
+        return obj.checkin.room.RoomNo if obj.checkin and obj.checkin.room else ''
+    
+    room_no.short_description = 'RoomNo'
+
+    def room_status(self, obj):
+        return obj.checkin.room.status if obj.checkin and obj.checkin.room else ''
+    
+    room_status.short_description = 'Room Status'
+
+
+    def house_owner(self, obj):
+        return obj.checkin.room.HouseOwner.name if obj.checkin and obj.checkin.room and obj.checkin.room.HouseOwner else ''
+    
+    house_owner.short_description = 'HouseOwner'
+
+    def formatted_previous_water(self, obj):
+        if obj.utilities:
+            previous_water = obj.utilities.previous_water
+            return format_html('{} m³', int(float(previous_water)) if float(previous_water).is_integer() else float(previous_water))
+        return ''
+
+    formatted_previous_water.short_description = 'Previous Water'
+
+    def formatted_current_water(self, obj):
+        current_water = obj.current_water
+        return format_html('{} m³', int(float(current_water)) if float(current_water).is_integer() else float(current_water))
+    
+    formatted_current_water.short_description = 'Current Water'
+
+    def formatted_water_fee(self, obj):
+        if obj.utilities:
+            water_fee = (obj.current_water - obj.utilities.previous_water) * Decimal('0.5')
+            return format_html('${}', '{:.0f}'.format(water_fee))
+        return ''
+
+    formatted_water_fee.short_description = 'Water Fee'
+
+    def formatted_trash_price(self, obj):
+        return format_html('${}', int(float(obj.trash.TrashPrice)) if float(obj.trash.TrashPrice).is_integer() else float(obj.trash.TrashPrice)) if obj.trash else ''
+    
+    formatted_trash_price.short_description = 'Trash Price'
+
+    def formatted_parking_fee(self, obj):
+        return format_html('${}', int(float(obj.parking.ParkingPrice)) if float(obj.parking.ParkingPrice).is_integer() else float(obj.parking.ParkingPrice)) if obj.parking else ''
+    
+    formatted_parking_fee.short_description = 'Parking Fee'
+
+    def formatted_room_fee(self, obj):
+        return format_html('${}', int(float(obj.checkin.room.RoomFee)) if float(obj.checkin.room.RoomFee).is_integer() else float(obj.checkin.room.RoomFee)) if obj.checkin and obj.checkin.room and obj.checkin.room.RoomFee else ''
+    
+    formatted_room_fee.short_description = 'Room Fee'
+
+    def formatted_sub_total(self, obj):
+        total_fee = obj.sub_total
+        return format_html('${}', int(float(total_fee)) if float(total_fee).is_integer() else float(total_fee))
+    
+    formatted_sub_total.short_description = 'Sub Total'

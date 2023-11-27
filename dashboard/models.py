@@ -141,6 +141,52 @@ class CheckOut(models.Model):
 
 class utilities(models.Model):
     room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='utilities')
-    previous_water = models.DecimalField(max_digits=10, decimal_places=2)
-    other_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    previous_water = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    other_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     remark = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return f'Room {self.room.RoomNo}, Previous Water: {self.previous_water} m³'
+
+
+class MonthlyRentalFee(models.Model):
+    checkin = models.ForeignKey(CheckIn, on_delete=models.CASCADE,null=True, blank=True)
+    utilities = models.ForeignKey(utilities, on_delete=models.CASCADE)
+    current_water = models.DecimalField(max_digits=10, decimal_places=2)
+    parking = models.ForeignKey(parking, on_delete=models.CASCADE)
+    trash = models.ForeignKey(Trash, on_delete=models.CASCADE)
+    sub_total = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+
+    def save(self, *args, **kwargs):
+        # Calculate sub_total based on the difference between current_water and previous_water
+        if self.utilities:
+            previous_water = self.utilities.previous_water if self.utilities else Decimal('0')
+            difference = self.current_water - previous_water
+            # Assuming the rate is 0.50, you can adjust it accordingly
+            water_rate = Decimal('0.50')
+            self.sub_total = difference * water_rate
+
+        # Calculate total including fees for trash, parking, and room
+        total_fee = self.sub_total
+
+        # Add fees for trash, parking, and room
+        if self.trash:
+            total_fee += getattr(self.trash, 'TrashPrice', Decimal('0'))
+
+        if self.parking:
+            total_fee += getattr(self.parking, 'ParkingPrice', Decimal('0'))
+
+        if self.checkin and self.checkin.room:
+            total_fee += getattr(self.checkin.room, 'RoomFee', Decimal('0'))
+
+        print(f"Water Fee: {self.sub_total}")
+        print(f"Trash Fee: {getattr(self.trash, 'TrashPrice', Decimal('0'))}")
+        print(f"Parking Fee: {getattr(self.parking, 'ParkingPrice', Decimal('0'))}")
+        print(f"Room Fee: {getattr(self.checkin.room, 'RoomFee', Decimal('0'))}")
+
+        # Assign the calculated total_fee to sub_total only once
+        self.sub_total = total_fee
+
+        super().save(*args, **kwargs)
+
+
