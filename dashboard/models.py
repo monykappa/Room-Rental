@@ -78,46 +78,69 @@ class Trash(models.Model):
 
     def __str__(self):
         return f'${self.TrashPrice}'
-    
+
+
 class room(models.Model):
+    AVAILABLE = 'Available/ទំនេរ'
+    IN_USE = 'In-use/កំពុង​ប្រើ'
+
+    STATUS_CHOICES = [
+        (AVAILABLE, 'Available/ទំនេរ'),
+        (IN_USE, 'In-use/កំពុង​ប្រើ'),
+    ]
+
     HouseOwner = models.ForeignKey(HouseOwner, on_delete=models.CASCADE)
     RoomNo = models.CharField(max_length=200)
     RoomFee = models.DecimalField(max_digits=10, decimal_places=2)
     remark = models.CharField(max_length=200, null=True, blank=True)
-    status = models.CharField(max_length=20, default='available')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=AVAILABLE)
 
     def __str__(self):
         return f'{self.RoomNo} - ${self.RoomFee} - Owner: {self.HouseOwner.name}'
 
 
 
-
 class CheckIn(models.Model):
-    ClientName = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='checkins')
+    client_name = models.CharField(max_length=200, null=True)
+    client_address = models.CharField(max_length=500, choices=provinces.PROVINCE_CHOICES, null=True)
+    client_contact = models.CharField(max_length=200, null=True)
     room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkins')
     parking = models.ForeignKey(parking, on_delete=models.CASCADE, null=True)
     trash = models.ForeignKey(Trash, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=timezone.now().date())
+    date = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        self.room.status = 'in-use'
+        # Create or get the client
+        client, created = Client.objects.get_or_create(
+            ClientName=self.client_name,
+            address=self.client_address,
+            contact=self.client_contact
+        )
+        self.room.status = 'In-use/កំពុង​ប្រើ'
         self.room.save()
+        self.client = client
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.ClientName} - Room: {self.room.RoomNo} - Fee: ${self.room.RoomFee}'
+        return f'{self.client_name} - Room: {self.room.RoomNo} - Fee: ${self.room.RoomFee}'
 
 class CheckOut(models.Model):
     ClientName = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='checkouts')
     room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkouts')
-    date = models.DateField(default=timezone.now().date())
+    date = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        self.room.status = 'available'
+        self.room.status = 'Available/ទំនេរ'
         self.room.save()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.ClientName} - Checked out from Room: {self.room.RoomNo}'
 
+    
 
+class utilities(models.Model):
+    room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='utilities')
+    previous_water = models.DecimalField(max_digits=10, decimal_places=2)
+    other_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    remark = models.CharField(max_length=200, null=True, blank=True)
