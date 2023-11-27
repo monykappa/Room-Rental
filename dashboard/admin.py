@@ -173,6 +173,17 @@ class UtilitiesAdmin(admin.ModelAdmin):
     list_display = ('room', 'previous_water', 'other_fee', 'remark')
 
 
+@admin.register(WaterUsageHistory)
+class WaterUsageHistoryAdmin(admin.ModelAdmin):
+    list_display = ('utilities_room', 'previous_water', 'date')
+    list_filter = ('utilities__room__HouseOwner',)
+
+    def utilities_room(self, obj):
+        return f'Room {obj.utilities.room.RoomNo}' if obj.utilities and obj.utilities.room else ''
+
+    utilities_room.short_description = 'Utilities Room'
+    
+
 @admin.register(MonthlyRentalFee)
 class MonthlyRentalFeeAdmin(admin.ModelAdmin):
     list_display = (
@@ -186,6 +197,7 @@ class MonthlyRentalFeeAdmin(admin.ModelAdmin):
         'formatted_parking_fee',
         'formatted_room_fee',
         'formatted_sub_total',
+        'date',
     )
 
     list_filter = ('checkin__room__HouseOwner',)

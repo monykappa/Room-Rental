@@ -149,6 +149,11 @@ class utilities(models.Model):
         return f'Room {self.room.RoomNo}, Previous Water: {self.previous_water} m³'
 
 
+class WaterUsageHistory(models.Model):
+    utilities = models.ForeignKey(utilities, on_delete=models.CASCADE, related_name='water_usage_history')
+    previous_water = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateTimeField(auto_now_add=True)
+
 class MonthlyRentalFee(models.Model):
     checkin = models.ForeignKey(CheckIn, on_delete=models.CASCADE,null=True, blank=True)
     utilities = models.ForeignKey(utilities, on_delete=models.CASCADE)
@@ -156,8 +161,17 @@ class MonthlyRentalFee(models.Model):
     parking = models.ForeignKey(parking, on_delete=models.CASCADE)
     trash = models.ForeignKey(Trash, on_delete=models.CASCADE)
     sub_total = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    date = models.DateTimeField(auto_now_add=True, null=True)  
 
     def save(self, *args, **kwargs):
+        # Update the utilities model's previous_water with the current_water
+        if self.utilities:
+            self.utilities.previous_water = self.current_water
+            self.utilities.save()
+
+            # Create a new WaterUsageHistory record
+            WaterUsageHistory.objects.create(utilities=self.utilities, previous_water=self.current_water)
+
         # Calculate sub_total based on the difference between current_water and previous_water
         if self.utilities:
             previous_water = self.utilities.previous_water if self.utilities else Decimal('0')
@@ -179,14 +193,7 @@ class MonthlyRentalFee(models.Model):
         if self.checkin and self.checkin.room:
             total_fee += getattr(self.checkin.room, 'RoomFee', Decimal('0'))
 
-        print(f"Water Fee: {self.sub_total}")
-        print(f"Trash Fee: {getattr(self.trash, 'TrashPrice', Decimal('0'))}")
-        print(f"Parking Fee: {getattr(self.parking, 'ParkingPrice', Decimal('0'))}")
-        print(f"Room Fee: {getattr(self.checkin.room, 'RoomFee', Decimal('0'))}")
-
         # Assign the calculated total_fee to sub_total only once
         self.sub_total = total_fee
 
         super().save(*args, **kwargs)
-
-
