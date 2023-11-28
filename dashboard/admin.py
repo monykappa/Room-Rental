@@ -6,6 +6,8 @@ from django.utils.html import format_html
 from django.db.models import OuterRef, Subquery
 from django.db.models import Max, F, ExpressionWrapper, fields, Q
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import timedelta
+
 
 
 class ClientInline(admin.TabularInline):
@@ -170,18 +172,28 @@ class MonthlyRentalFeeForm(forms.ModelForm):
 
 @admin.register(utilities)
 class UtilitiesAdmin(admin.ModelAdmin):
-    list_display = ('room', 'previous_water', 'other_fee', 'remark')
+    list_display = ('room', 'get_previous_water', 'other_fee', 'remark')
 
+    def get_previous_water(self, obj):
+        return f'{obj.current_water} m³'
+
+    get_previous_water.short_description = 'Previous Water'
 
 @admin.register(WaterUsageHistory)
 class WaterUsageHistoryAdmin(admin.ModelAdmin):
-    list_display = ('utilities_room', 'previous_water', 'date')
+    list_display = ('utilities_room', 'formatted_previous_water', 'date')
     list_filter = ('utilities__room__HouseOwner',)
 
     def utilities_room(self, obj):
         return f'Room {obj.utilities.room.RoomNo}' if obj.utilities and obj.utilities.room else ''
 
     utilities_room.short_description = 'Utilities Room'
+
+    def formatted_previous_water(self, obj):
+        return f'{obj.previous_water} m³'
+
+    formatted_previous_water.short_description = 'Previous Water'
+
     
 
 @admin.register(MonthlyRentalFee)
@@ -225,9 +237,21 @@ class MonthlyRentalFeeAdmin(admin.ModelAdmin):
 
     def formatted_previous_water(self, obj):
         if obj.utilities:
-            previous_water = obj.utilities.previous_water
-            return format_html('{} m³', int(float(previous_water)) if float(previous_water).is_integer() else float(previous_water))
-        return ''
+            # Fetch the MonthlyRentalFee entry for the month before the current MonthlyRentalFee entry
+            previous_month_entry = MonthlyRentalFee.objects.filter(
+                utilities=obj.utilities,
+                date__lt=obj.date
+            ).order_by('-date').first()
+
+            if previous_month_entry:
+                return format_html('{} m³', int(float(previous_month_entry.current_water)) if float(previous_month_entry.current_water).is_integer() else float(previous_month_entry.current_water))
+            else:
+                # If there's no history, display 0 m³
+                return format_html('{} m³', 0)
+
+        return format_html('{} m³', 0)
+
+
 
     formatted_previous_water.short_description = 'Previous Water'
 

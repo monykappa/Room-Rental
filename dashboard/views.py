@@ -15,3 +15,8 @@ from django.contrib.auth.views import LogoutView
 from django.db.models import Q
 from decimal import Decimal
 from django.views.decorators.http import require_POST
+
+
+def base(request):
+    template = 'base.html'  
+    return render(request, template)

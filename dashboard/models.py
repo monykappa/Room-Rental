@@ -7,6 +7,8 @@ import uuid
 from decimal import Decimal
 from django.utils import timezone
 import os
+from dal import autocomplete
+
 
 
 def validate_file_extension(value): 
@@ -142,11 +144,12 @@ class CheckOut(models.Model):
 class utilities(models.Model):
     room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='utilities')
     previous_water = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    current_water = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     other_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     remark = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return f'Room {self.room.RoomNo}, Previous Water: {self.previous_water} m³'
+        return f'Room {self.room.RoomNo}, Previous Water: {self.current_water} m³'
 
 
 class WaterUsageHistory(models.Model):
@@ -161,39 +164,45 @@ class MonthlyRentalFee(models.Model):
     parking = models.ForeignKey(parking, on_delete=models.CASCADE)
     trash = models.ForeignKey(Trash, on_delete=models.CASCADE)
     sub_total = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    water_fee = models.DecimalField(max_digits=10, decimal_places=2, editable=False, null=True)
+    water_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.5)
     date = models.DateTimeField(auto_now_add=True, null=True)  
 
     def save(self, *args, **kwargs):
-        # Update the utilities model's previous_water with the current_water
+        # Fetch the latest WaterUsageHistory entry for the same utilities
+        previous_water_entry = WaterUsageHistory.objects.filter(
+            utilities=self.utilities
+        ).order_by('-date').first()
+
+        if previous_water_entry:
+            # Use previous_water from WaterUsageHistory
+            previous_water = previous_water_entry.previous_water
+        else:
+            # Use the initial value if no previous_water_entry
+            previous_water = Decimal('0')
+
+        # Calculate the difference between current and previous water
+        water_difference = self.current_water - previous_water
+
+        # Use the water_rate from the MonthlyRentalFee model
+        water_rate = self.water_rate
+        water_fee = max(0, water_difference) * water_rate  # Calculate water_fee, ensuring it's not negative
+
+        # Update the attribute to water_fee
+        self.water_fee = water_fee
+
+        # Update the utilities model's previous_water and current_water
         if self.utilities:
             self.utilities.previous_water = self.current_water
+            self.utilities.current_water = self.current_water
             self.utilities.save()
 
             # Create a new WaterUsageHistory record
             WaterUsageHistory.objects.create(utilities=self.utilities, previous_water=self.current_water)
 
-        # Calculate sub_total based on the difference between current_water and previous_water
+        # Calculate sub_total based on the positive difference between current_water and previous_water
         if self.utilities:
-            previous_water = self.utilities.previous_water if self.utilities else Decimal('0')
-            difference = self.current_water - previous_water
-            # Assuming the rate is 0.50, you can adjust it accordingly
-            water_rate = Decimal('0.50')
-            self.sub_total = difference * water_rate
-
-        # Calculate total including fees for trash, parking, and room
-        total_fee = self.sub_total
-
-        # Add fees for trash, parking, and room
-        if self.trash:
-            total_fee += getattr(self.trash, 'TrashPrice', Decimal('0'))
-
-        if self.parking:
-            total_fee += getattr(self.parking, 'ParkingPrice', Decimal('0'))
-
-        if self.checkin and self.checkin.room:
-            total_fee += getattr(self.checkin.room, 'RoomFee', Decimal('0'))
-
-        # Assign the calculated total_fee to sub_total only once
-        self.sub_total = total_fee
+            # Assuming the rate for other fees is 1, you can adjust it accordingly
+            self.sub_total = self.water_fee + self.trash.TrashPrice + self.parking.ParkingPrice + self.checkin.room.RoomFee
 
         super().save(*args, **kwargs)
