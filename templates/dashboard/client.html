@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/client.css' %}">
+{% endblock css %}
+
+{% block title %}
+Client
+{% endblock title %}
+
+<body>
+    {% block content %}
+    <div class="client-ctn">
+        <h2>Client List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Address</th>
+                    <th>Contact</th>
+                    <th>Remark</th>
+                    <th>Edit</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td data-field="ClientName">{{ client.ClientName }}</td>
+                    <td data-field="address">{{ client.address }}</td>
+                    <td data-field="contact">{{ client.contact }}</td>
+                    <td data-field="remark">{{ client.remark }}</td>
+                    <td>
+                        <a href="{% url 'dashboard:client-edit' client.pk %}">Edit</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'dashboard:client-delete' client.pk %}">Delete</a>
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="edit-form-container" style="display: none;"></div>
+
+    {% endblock content %}
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+
+$(document).ready(function () {
+        $('.edit-client').click(function () {
+            var pk = $(this).data('pk');
+            $.ajax({
+                url: '{% url "dashboard:client-edit" %}?pk=' + pk,
+                type: 'get',
+                dataType: 'html',
+                success: function (data) {
+                    $('.edit-form-container').html(data).show();
+                }
+            });
+        });
+
+        $('.edit-form-container').on('submit', 'form', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                type: 'post',
+                data: form.serialize(),
+                dataType: 'html',
+                success: function (data) {
+                    $('.edit-form-container').html('').hide();
+                    // You may want to update the edited row in the table here
+                }
+            });
+        });
+    });
+
+    </script>
+</body>

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/room_list.css' %}"> {% endblock %}
+{% block title %}
+Room-List
+{% endblock title %}
+
+<body>
+    {% block content %}
+
+    <div class="room-ctn">
+        <h2>Room List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Room Number</th>
+                    <th>Room Fee</th>
+                    <th>House Owner</th>
+                    <th>Client Name</th>
+                    <th>Date Check-In</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                    <tr>
+                        <td>{{ room.RoomNo }}</td>
+                        <td>${{ room.RoomFee }}</td>
+                        <td>{{ room.HouseOwner.name }}</td>
+                        <td>
+                            {% if room.status == 'In-use/កំពុង​ប្រើ' %}
+                                {% for checkin in room.check_in_entries.all %}
+                                    {{ checkin.client_name }}
+                                {% endfor %}
+                            {% else %}
+                                No Check-In
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if room.status == 'In-use/កំពុង​ប្រើ' %}
+                                {% for checkin in room.check_in_entries.all %}
+                                    {{ checkin.date|date:"Y-m-d" }}
+                                {% endfor %}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td style="background-color: {% if room.status == 'In-use/កំពុង​ប្រើ' %}red{% elif room.status == 'Available/ទំនេរ' %}green{% endif %}; color: white;">
+                            {{ room.status }}
+                        </td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    </div>
+    {% endblock content %}
+</body>

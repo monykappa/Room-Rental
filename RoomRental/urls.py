@@ -6,7 +6,7 @@ from django.urls import re_path as url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dashboard/', include('dashboard.urls')),
+    path('', include('dashboard.urls')),
 ]
 
 if settings.DEBUG:

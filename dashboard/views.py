@@ -14,9 +14,55 @@ from django.utils import timezone
 from django.contrib.auth.views import LogoutView
 from django.db.models import Q
 from decimal import Decimal
+from django.views.generic import ListView, DeleteView, UpdateView
+from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
+from .forms import ClientForm
+
 
 
 def base(request):
     template = 'base.html'  
     return render(request, template)
+
+def dashboard(request):
+    template = 'dashboard/dashboard.html'
+    return render(request, template)
+
+def room_list(request):
+    rooms = room.objects.prefetch_related('check_in_entries').all()
+    return render(request, 'dashboard/room-list.html', {'rooms': rooms})
+
+def client(request):
+    clients = Client.objects.all()
+    return render(request, 'dashboard/client.html', {'clients': clients})
+
+class ClientListView(ListView):
+    model = Client
+    template_name = 'dashboard/client.html'
+    context_object_name = 'clients'
+
+class ClientEditView(UpdateView):
+    model = Client
+    form_class = ClientForm
+    template_name = 'dashboard/client_edit_form.html'
+    success_url = reverse_lazy('dashboard:client-list-class-based')
+    
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object, form=self.get_form())
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+
+class ClientDeleteView(DeleteView):
+    model = Client
+    template_name = 'dashboard/client_confirm_delete.html'
+    success_url = reverse_lazy('dashboard:client-list-class-based')

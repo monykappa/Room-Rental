@@ -61,11 +61,7 @@ class Client(models.Model):
     def __str__(self):
         return self.ClientName
 
-class HouseOwner(models.Model):
-    name = models.CharField(max_length=200)
 
-    def __str__(self):
-        return self.name
 
 class parking(models.Model):
     ParkingPrice = models.DecimalField(max_digits=10, decimal_places=2)
@@ -80,6 +76,15 @@ class Trash(models.Model):
 
     def __str__(self):
         return f'${self.TrashPrice}'
+
+class HouseOwner(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+
+
 
 
 class room(models.Model):
@@ -106,7 +111,7 @@ class CheckIn(models.Model):
     client_name = models.CharField(max_length=200, null=True)
     client_address = models.CharField(max_length=500, choices=provinces.PROVINCE_CHOICES, null=True)
     client_contact = models.CharField(max_length=200, null=True)
-    room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkins')
+    room = models.ForeignKey('room', on_delete=models.CASCADE, related_name='check_in_entries')
     parking = models.ForeignKey(parking, on_delete=models.CASCADE, null=True)
     trash = models.ForeignKey(Trash, on_delete=models.CASCADE, null=True)
     date = models.DateField(default=timezone.now)
@@ -125,6 +130,8 @@ class CheckIn(models.Model):
 
     def __str__(self):
         return f'{self.client_name} - Room: {self.room.RoomNo} - Fee: ${self.room.RoomFee}'
+
+
 
 class CheckOut(models.Model):
     ClientName = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='checkouts')

@@ -1,0 +1,26 @@
+
+.room-ctn{
+    width:100%;
+    display: block;
+    margin: auto;
+    margin-top: 5vh;
+}
+table{
+    margin: auto;
+    width:100%;
+    font-size: 18px;
+    
+}
+thead th{
+    padding:15px;
+}
+thead tr{
+    border:1px solid grey;
+}
+tbody tr{
+    border:1px solid grey;
+    padding:5px;
+}
+tbody td{
+    padding: 15px;
+}
