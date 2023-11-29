@@ -4,6 +4,8 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/dashboard/room_list.css' %}"> {% endblock %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 {% block title %}
 Room-List/បញ្ជីបន្ទប់
 {% endblock title %}
@@ -12,10 +14,39 @@ Room-List/បញ្ជីបន្ទប់
     {% block content %}
 
     <div class="room-ctn">
-        <h2>Room List</h2>
+        <h2>Room List / បញ្ជីបន្ទប់</h2>
         <a href="{% url 'dashboard:add_room' %}">
-            <button>Add New Room</button>
+            <button class="btn btn-primary" style="margin:10px 0; background-color: green; border: none;">+ Add New Room
+                / បន្ថែមបន្ទប់ថ្មី</button>
         </a>
+        <div>
+            <label for="house-owner-filter">Sort by House Owner:</label>
+            <select id="house-owner-filter">
+                <option value="">All</option>
+                {% for house_owner in house_owners %}
+                <option value="{{ house_owner.id }}">{{ house_owner.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="room-status-filter">Sort by Room Status:</label>
+            <select id="room-status-filter">
+                <option value="">All</option>
+                <option value="In-use/កំពុង​ប្រើ">In-use</option>
+                <option value="Available/ទំនេរ">Available</option>
+                <!-- Add other room status options as needed -->
+            </select>
+
+            <label for="room-fee-order-filter">Sort by Room Fee:</label>
+            <select id="room-fee-order-filter">
+                <option value="">None</option>
+                <option value="asc">Lowest to Highest</option>
+                <option value="desc">Highest to Lowest</option>
+            </select>
+        </div>
+
+
+
+
         <table>
             <thead>
                 <tr>
@@ -29,37 +60,95 @@ Room-List/បញ្ជីបន្ទប់
             </thead>
             <tbody>
                 {% for room in rooms %}
-                    <tr>
-                        <td>{{ room.RoomNo }}</td>
-                        <td>{{ room.HouseOwner.name }}</td>
-                        <td>${{ room.RoomFee }}</td>
-                        <td>
-                            {% if room.status == 'In-use/កំពុង​ប្រើ' %}
-                                {% for checkin in room.check_in_entries.all %}
-                                    {{ checkin.client_name }}
-                                {% endfor %}
-                            {% else %}
-                                No Check-In
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if room.status == 'In-use/កំពុង​ប្រើ' %}
-                                {% for checkin in room.check_in_entries.all %}
-                                    {{ checkin.date|date:"Y-m-d" }}
-                                {% endfor %}
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td style="background-color: {% if room.status == 'In-use/កំពុង​ប្រើ' %}red{% elif room.status == 'Available/ទំនេរ' %}green{% endif %}; color: white;">
-                            {{ room.status }}
-                        </td>
-                        
-                    </tr>
+                <tr>
+                    <td>{{ room.RoomNo }}</td>
+                    <td>{{ room.HouseOwner.name }}</td>
+                    <td>${{ room.RoomFee }}</td>
+                    <td>
+                        {% if room.status == 'In-use/កំពុង​ប្រើ' %}
+                        {% for checkin in room.check_in_entries.all %}
+                        {{ checkin.client_name }}
+                        {% endfor %}
+                        {% else %}
+                        No Check-In
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if room.status == 'In-use/កំពុង​ប្រើ' %}
+                        {% for checkin in room.check_in_entries.all %}
+                        {{ checkin.date|date:"Y-m-d" }}
+                        {% endfor %}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+                    <td
+                        style="background-color: {% if room.status == 'In-use/កំពុង​ប្រើ' %}red{% elif room.status == 'Available/ទំនេរ' %}green{% endif %}; color: white;">
+                        {{ room.status }}
+                    </td>
+
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+        $("#house-owner-filter, #room-status-filter, #room-fee-order-filter").change(function () {
+            filterAndSortRows();
+        });
+    });
+
+    function filterAndSortRows() {
+        var selectedHouseOwnerId = $("#house-owner-filter").val();
+        var selectedRoomStatus = $("#room-status-filter").val();
+        var selectedRoomFeeOrder = $("#room-fee-order-filter").val();
+
+        // Show all rows initially
+        $('tbody > tr').hide();
+
+        // Show rows that match the selected house owner
+        if (selectedHouseOwnerId) {
+            $('tbody > tr:has(td:eq(1):contains("' + $('#house-owner-filter option:selected').text() + '"))').show();
+        } else {
+            // Show all rows if "All" is selected
+            $('tbody > tr').show();
+        }
+
+        // Filter rows based on room status
+        if (selectedRoomStatus) {
+            $('tbody > tr:visible').not(':has(td:eq(5):contains("' + selectedRoomStatus + '"))').hide();
+        }
+
+        // Delay sorting to allow for proper updating
+        setTimeout(sortRows, 100, selectedRoomFeeOrder);
+    }
+
+    function sortRows(selectedRoomFeeOrder) {
+        // Sort rows based on room fee
+        var selector = 'td:eq(2)'; // Room Fee column
+        var rowsToSort = $('tbody > tr:visible').get();
+
+        rowsToSort.sort(function (a, b) {
+            var valueA = parseFloat($(selector, a).text().replace('$', ''));
+            var valueB = parseFloat($(selector, b).text().replace('$', ''));
+
+            if (selectedRoomFeeOrder === 'desc') {
+                return valueB - valueA; // Sort from highest to lowest
+            } else if (selectedRoomFeeOrder === 'asc') {
+                return valueA - valueB; // Sort from lowest to highest
+            } else {
+                return 0; // No sorting
+            }
+        });
+
+        $('tbody').empty().append(rowsToSort);
+        
+        // Log the status for debugging
+        console.log("Sorted rows:", rowsToSort);
+    }
+    </script>
     {% endblock content %}
+
 </body>

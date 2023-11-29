@@ -20,6 +20,8 @@ from django.views.decorators.http import require_POST
 from .forms import *
 from .models import CheckIn as CheckInModel
 from django.urls import reverse
+from django.db.models import Max
+from datetime import timedelta
 
 
 
@@ -47,8 +49,9 @@ def add_room(request):
     return render(request, 'dashboard/add_room.html', {'house_owners': house_owners, 'form': form})
 
 def room_list(request):
-    rooms = room.objects.prefetch_related('check_in_entries').all()
-    return render(request, 'dashboard/room_list.html', {'rooms': rooms})
+    rooms = room.objects.annotate(latest_checkin=Max('check_in_entries__date')).order_by('-latest_checkin')
+    house_owners = HouseOwner.objects.all()
+    return render(request, 'dashboard/room_list.html', {'rooms': rooms, 'house_owners': house_owners})
 
 
 def client(request):
@@ -88,3 +91,30 @@ class ClientDeleteView(DeleteView):
 def check_in(request):
     check_ins = CheckInModel.objects.all()
     return render(request, 'dashboard/check_in.html', {'CheckIn': check_ins})
+
+
+def checkin_form(request):
+    if request.method == 'POST':
+        form = CheckInForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Redirect to the check-in list page or any other page
+            return redirect('checkin_list')
+    else:
+        form = CheckInForm()
+
+    return render(request, 'dashboard/checkin_form.html', {'form': form})
+
+def check_out(request):
+    check_outs = CheckOut.objects.all()
+
+    for checkout in check_outs:
+        try:
+            checkin = CheckIn.objects.get(client_name=checkout.ClientName.ClientName)
+            checkout.total_stay = (checkout.date - checkin.date).days
+            checkout.checkin_date = checkin.date
+        except CheckIn.DoesNotExist:
+            checkout.total_stay = None
+            checkout.checkin_date = None
+
+    return render(request, 'dashboard/check_out.html', {'CheckOut': check_outs})

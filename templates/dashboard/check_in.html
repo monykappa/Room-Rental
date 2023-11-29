@@ -13,6 +13,9 @@ Check-In / ថែ្ងចូល
     {% block content %}
     <div class="checkin-ctn">
         <h2>Check-In List</h2>
+        <a href="{% url 'dashboard:checkin_form' %}">
+            <button type="button" class="btn btn-primary" style="margin: 10px 0;">Check-In</button>
+        </a>
         <table>
             <thead>
                 <tr>

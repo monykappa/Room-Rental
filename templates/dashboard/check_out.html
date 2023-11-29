@@ -11,6 +11,36 @@ Check-Out / ថែ្ងចេញ
 
 <body>
     {% block content %}
-        
+
+    <div class="check-out-ctn">
+        <h2>Check-Out List / បញ្ជីចាកចេញ</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Client Name / ឈ្មោះអតិថិជន</th>
+                    <th>Room Number / លេខ​បន្ទប់</th>
+                    <th>Check-In Date / កាលបរិច្ឆេទថែ្ងចូល</th>
+                    <th>Check-Out Date / កាលបរិច្ឆេទថែ្ងចេញ</th>
+                    <th>Total Stay / សរុបពេលនៃកាលបរិច្ឆេទ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for checkout in CheckOut %}
+                <tr>
+                    <td style="color:red;">{{ checkout.id }}</td>
+                    <td>{{ checkout.ClientName.ClientName }}</td>
+                    <td>{{ checkout.room.RoomNo }}</td>
+                    <td>{{ checkout.checkin_date|date:"Y-m-d" }}</td>
+                    <td>{{ checkout.date|date:"Y-m-d" }}</td>
+                    <td>{{ checkout.total_stay }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+
+
     {% endblock content %}
 </body>
