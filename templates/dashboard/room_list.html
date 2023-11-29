@@ -5,7 +5,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/dashboard/room_list.css' %}"> {% endblock %}
 {% block title %}
-Room-List
+Room-List/បញ្ជីបន្ទប់
 {% endblock title %}
 
 <body>
@@ -13,23 +13,26 @@ Room-List
 
     <div class="room-ctn">
         <h2>Room List</h2>
+        <a href="{% url 'dashboard:add_room' %}">
+            <button>Add New Room</button>
+        </a>
         <table>
             <thead>
                 <tr>
-                    <th>Room Number</th>
-                    <th>Room Fee</th>
-                    <th>House Owner</th>
-                    <th>Client Name</th>
-                    <th>Date Check-In</th>
-                    <th>Status</th>
+                    <th>Room Number / លេខ​បន្ទប់</th>
+                    <th>House Owner / ម្ចាស់ផ្ទះ</th>
+                    <th>Room Fee / ថ្លៃបន្ទប់</th>
+                    <th>Client Name / ឈ្មោះអតិថិជន</th>
+                    <th>Date Check-In / កាលបរិច្ឆេទថែ្ងចូល</th>
+                    <th>Room Status / ស្ថានភាព​បន្ទប់</th>
                 </tr>
             </thead>
             <tbody>
                 {% for room in rooms %}
                     <tr>
                         <td>{{ room.RoomNo }}</td>
-                        <td>${{ room.RoomFee }}</td>
                         <td>{{ room.HouseOwner.name }}</td>
+                        <td>${{ room.RoomFee }}</td>
                         <td>
                             {% if room.status == 'In-use/កំពុង​ប្រើ' %}
                                 {% for checkin in room.check_in_entries.all %}

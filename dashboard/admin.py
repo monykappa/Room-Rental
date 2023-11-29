@@ -94,8 +94,8 @@ class RoomAdmin(admin.ModelAdmin):
     make_in_use.short_description = 'Set selected rooms as In-use/កំពុង​ប្រើ'
 
     def get_client_name(self, obj):
-        if obj.status == 'In-use/កំពុង​ប្រើ' and obj.checkins.exists():
-            return obj.checkins.last().client_name
+        if obj.status == 'In-use/កំពុង​ប្រើ' and obj.check_in_entries.exists():
+            return obj.check_in_entries.last().client_name
         return ''
 
     get_client_name.short_description = 'Client Name / ឈ្មោះអតិថិជន'

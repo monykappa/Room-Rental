@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/check_in.css' %}">
+{% endblock css %}
+
+{% block title %}
+Check-In / ថែ្ងចូល
+{% endblock title %}
+
+<body>
+    {% block content %}
+    <div class="checkin-ctn">
+        <h2>Check-In List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Client Name</th>
+                    <th>Room Number</th>
+                    <th>House Owner</th>
+                    <th>Room Fee</th>
+                    <th>Date Check-In</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for checkin in CheckIn %}
+                    <tr>
+                        <td style="color:red;">{{ checkin.id }}</td>
+                        <td>{{ checkin.client_name }}</td>
+                        <td>{{ checkin.room.RoomNo }}</td>
+                        <td>{{ checkin.room.HouseOwner }}</td>
+                        <td>${{ checkin.room.RoomFee }}</td>
+                        <td>{{ checkin.date|date:"Y-m-d" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% endblock content %}
+</body>

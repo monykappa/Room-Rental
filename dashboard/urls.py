@@ -11,11 +11,13 @@ app_name = 'dashboard'
 urlpatterns = [
     path('base/', views.base, name='base'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('room-list/', views.room_list, name='room-list'),
+    path('add-room/', views.add_room, name='add_room'),
+    path('room_list/', views.room_list, name='room_list'),
     path('client/', views.client, name='client'),
     path('client/list/', views.ClientListView.as_view(), name='client-list-class-based'),
     path('client/<int:pk>/edit/', views.ClientEditView.as_view(), name='client-edit'),
     path('client/<int:pk>/delete/', views.ClientDeleteView.as_view(), name='client-delete'),
+    path('CheckIn/', views.check_in, name='CheckIn'),
 ]
 
 if settings.DEBUG:

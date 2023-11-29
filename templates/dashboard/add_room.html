@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Add new room</title>
+</head>
+
+<body>
+    {% block content %}
+    <div class="add-new-room-ctn" style="margin-top: 5vh;">
+        <a href="{% url 'dashboard:room_list' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
+        <div class="container mt-4">
+            <h2>Add New Room</h2>
+            <form method="post" action="{% url 'dashboard:add_room' %}" class="form"
+                style="border:1px solid green;padding:10px;width:700px;border-radius:5px; ">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.RoomNo.id_for_label }}" class="font-weight-bold">Room No:</label>
+                    {{ form.RoomNo }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.HouseOwner.id_for_label }}" class="font-weight-bold">House Owner:</label>
+                    {{ form.HouseOwner }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.RoomFee.id_for_label }}" class="font-weight-bold">Room Fee: $</label>
+                    {{ form.RoomFee }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.remark.id_for_label }}" class="font-weight-bold">Remark:</label>
+                    {{ form.remark }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}" class="font-weight-bold">Status:</label>
+                    {{ form.status }}
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-2">Add Room</button>
+            </form>
+        </div>
+    </div>
+    {% endblock content %}
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

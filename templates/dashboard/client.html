@@ -16,17 +16,19 @@ Client
         <table>
             <thead>
                 <tr>
-                    <th>Client Name</th>
-                    <th>Address</th>
-                    <th>Contact</th>
-                    <th>Remark</th>
-                    <th>Edit</th>
+                    <th>Id</th>
+                    <th>Client Name / ឈ្មោះអតិថិជន</th>
+                    <th>Address / អាស័យដ្ឋាន</th>
+                    <th>Contact / ទំនាក់ទំនង</th>
+                    <th>Remark / ចំណាំ</th>
+                    <th>Edit / កែ</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for client in clients %}
                 <tr>
+                    <td style="color:red;">{{ client.id }}</td>
                     <td data-field="ClientName">{{ client.ClientName }}</td>
                     <td data-field="address">{{ client.address }}</td>
                     <td data-field="contact">{{ client.contact }}</td>
