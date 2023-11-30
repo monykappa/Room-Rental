@@ -105,6 +105,19 @@ def checkin_form(request):
 
     return render(request, 'dashboard/checkin_form.html', {'form': form})
 
+
+def checkout_view(request, checkin_id):
+    checkin = get_object_or_404(CheckIn, pk=checkin_id)
+
+    # Create a CheckOut entry
+    CheckOut.objects.create(ClientName=checkin.client, room=checkin.room)
+
+    # Update room status
+    checkin.room.status = 'Available/ទំនេរ'
+    checkin.room.save()
+
+    return redirect('dashboard:check_in') 
+
 def check_out(request):
     check_outs = CheckOut.objects.all()
 

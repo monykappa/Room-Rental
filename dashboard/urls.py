@@ -18,6 +18,8 @@ urlpatterns = [
     path('client/<int:pk>/edit/', views.ClientEditView.as_view(), name='client-edit'),
     path('client/<int:pk>/delete/', views.ClientDeleteView.as_view(), name='client-delete'),
     path('CheckIn/', views.check_in, name='CheckIn'),
+    path('CheckIn/', views.check_in, name='check_in'),
+    path('CheckOut/<int:checkin_id>/', views.checkout_view, name='CheckOut'),
     path('CheckIn/form/', views.checkin_form, name='checkin_form'),
     path('CheckOut/', views.check_out, name='CheckOut'),
 

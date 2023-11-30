@@ -1,5 +1,24 @@
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save changes</button>
-</form>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Edit Client Info
+{% endblock title %}
+
+
+
+{% block content %}
+
+<div class="edit-client-ctn" style="width: 100%;  margin-top: 10vh;">
+    <a href="{% url 'dashboard:client' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
+    <h2 style="text-align: center; margin: 15px 0;">Edit Client Info / កែសម្រួលព័ត៌មានអតិថិជន</h2>
+    <form form method="post" enctype="multipart/form-data" style="width:600px; margin: auto; padding: 25px; border:1px solid green; border-radius: 5px; font-size: 18px;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
+
+</div>
+
+
+{% endblock content %}

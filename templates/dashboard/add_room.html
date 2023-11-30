@@ -18,9 +18,9 @@
     <div class="add-new-room-ctn" style="margin-top: 5vh;">
         <a href="{% url 'dashboard:room_list' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
         <div class="container mt-4">
-            <h2>Add New Room</h2>
+            <h2 style="text-align: center;margin: 15px 0;">Add New Room</h2>
             <form method="post" action="{% url 'dashboard:add_room' %}" class="form"
-                style="border:1px solid green;padding:50px;width:700px;border-radius:5px; ">
+                style="border:1px solid green;padding:50px;width:700px;border-radius:5px; margin:auto; ">
                 {% csrf_token %}
 
                 <div class="form-group">

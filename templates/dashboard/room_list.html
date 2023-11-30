@@ -15,11 +15,12 @@ Room-List/បញ្ជីបន្ទប់
 
     <div class="room-ctn">
         <h2>Room List / បញ្ជីបន្ទប់</h2>
-        <a href="{% url 'dashboard:add_room' %}">
-            <button class="btn btn-primary" style="margin:10px 0; background-color: green; border: none;">+ Add New Room
-                / បន្ថែមបន្ទប់ថ្មី</button>
-        </a>
         <div>
+            <a href="{% url 'dashboard:add_room' %}">
+                <button class="btn btn-primary" style="margin:10px 0; background-color: green; border: none;">+ Add New Room
+                    / បន្ថែមបន្ទប់ថ្មី</button>
+            </a>
+            
             <label for="house-owner-filter">Sort by House Owner:</label>
             <select id="house-owner-filter">
                 <option value="">All</option>
@@ -42,6 +43,7 @@ Room-List/បញ្ជីបន្ទប់
                 <option value="asc">Lowest to Highest</option>
                 <option value="desc">Highest to Lowest</option>
             </select>
+            
         </div>
 
 

@@ -23,3 +23,7 @@ tbody tr{
 tbody td{
     padding: 15px;
 }
+button.btn-check-in{
+    background-color: green;
+    border: none;
+}

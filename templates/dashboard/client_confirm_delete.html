@@ -10,5 +10,5 @@
         {% csrf_token %}
         <input type="submit" value="Confirm">
     </form>
-    <p><a href="{% url 'client-list' %}">Cancel</a></p>
+    <p><a href="{% url 'dashbaord:client-list' %}">Cancel</a></p>
 {% endblock content %}

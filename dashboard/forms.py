@@ -33,6 +33,16 @@ class CheckInForm(forms.ModelForm):
     class Meta:
         model = CheckIn
         fields = ['client_name', 'client_address', 'client_contact', 'room', 'parking', 'trash', 'date']
+        labels = {
+            'client_name': 'Client name / ឈ្មោះអតិថិជន',
+            'client_address': 'Client address / អាសយដ្ឋានអតិថិជន',
+            'client_contact': 'Client contact / ទំនាក់ទំនងអតិថិជន',
+            'room': 'Room / បន្ទប់',
+            'parking': 'Parking / ទីតាំងដំឡូង',
+            'trash': 'Trash / ធាតុសករាជ',
+            'date': 'Date / កាលបរិច្ឆេទ',
+            # Add labels for other fields as needed
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -48,3 +58,15 @@ class CheckInForm(forms.ModelForm):
             Field('trash', css_class='form-control mb-2'),
             Field('date', css_class='form-control mb-2'),
         )
+
+        
+class CheckOutForm(forms.ModelForm):
+    class Meta:
+        model = CheckOut
+        fields = ['ClientName', 'room']  # Include only the fields you want to display
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['ClientName'].widget.attrs['readonly'] = True  # Make the client name field read-only
+        self.fields['room'].widget.attrs['readonly'] = True  # Make the room field read-only
+        self.fields['room'].label = 'Room / បន្ទប់'  # Customize the label if needed

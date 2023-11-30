@@ -107,6 +107,22 @@ class room(models.Model):
 
 
 
+
+
+class CheckOut(models.Model):
+    ClientName = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='checkouts')
+    room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkouts')
+    date = models.DateField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        self.room.status = 'Available/ទំនេរ'
+        self.room.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.ClientName} - Checked out from Room: {self.room.RoomNo}'
+
+
 class CheckIn(models.Model):
     client_name = models.CharField(max_length=200, null=True)
     client_address = models.CharField(max_length=500, choices=provinces.PROVINCE_CHOICES, null=True)
@@ -127,26 +143,13 @@ class CheckIn(models.Model):
         self.room.save()
         self.client = client
         super().save(*args, **kwargs)
-
+    
+    def has_checked_out(self):
+        return self.client.checkouts.exists() 
+    
     def __str__(self):
         return f'{self.client_name} - Room: {self.room.RoomNo} - Fee: ${self.room.RoomFee}'
 
-
-
-class CheckOut(models.Model):
-    ClientName = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='checkouts')
-    room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkouts')
-    date = models.DateField(default=timezone.now)
-
-    def save(self, *args, **kwargs):
-        self.room.status = 'Available/ទំនេរ'
-        self.room.save()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f'{self.ClientName} - Checked out from Room: {self.room.RoomNo}'
-
-    
 
 class utilities(models.Model):
     room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='utilities')
