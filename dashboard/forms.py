@@ -42,11 +42,12 @@ class CheckInForm(forms.ModelForm):
             'parking': 'Parking / ទីតាំងដំឡូង',
             'trash': 'Trash / ធាតុសករាជ',
             'date': 'Date / កាលបរិច្ឆេទ',
-            # Add labels for other fields as needed
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['room'].queryset = room.objects.filter(status=room.AVAILABLE)
+
         self.helper = FormHelper()
         self.helper.form_class = 'form'
         self.helper.label_class = 'font-weight-bold'
@@ -54,13 +55,11 @@ class CheckInForm(forms.ModelForm):
             Field('client_name', css_class='form-control mb-2'),
             Field('client_address', css_class='form-control mb-2'),
             Field('client_contact', css_class='form-control mb-2'),
-            Field('room', css_class='form-control mb-2'),
+            Field('room', css_class='form-control mb-2'), 
             Field('parking', css_class='form-control mb-2'),
             Field('trash', css_class='form-control mb-2'),
             Field('date', css_class='form-control mb-2'),
         )
-
-
 
 class check_out_form(forms.ModelForm):
     class Meta:
@@ -69,18 +68,17 @@ class check_out_form(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(check_out_form, self).__init__(*args, **kwargs)
+        self.fields['room'].queryset = room.objects.filter(status=room.IN_USE)
 
-        # Set the queryset for the 'room' field and order by status
-        if 'instance' in kwargs and kwargs['instance']:
-            # If the form is for an existing instance (edit mode), set the queryset based on the instance
-            self.fields['room'].queryset = room.objects.filter(pk=kwargs['instance'].room.pk)
-        else:
-            # If the form is for a new instance (create mode), set the queryset for all rooms and order by status
-            self.fields['room'].queryset = room.objects.all().order_by('status')
+        self.helper = FormHelper()
+        self.helper.form_class = 'form'
+        self.helper.label_class = 'font-weight-bold'
+        self.helper.layout = Layout(
+            Field('room', css_class='form-control mb-2', data_url='/room-search/'),  # Add data_url for AJAX room search
+            Field('date', css_class='form-control mb-2'),
+        )
 
-        # Add a class to the 'room' field widget based on the room status
-        room_status = self.fields['room'].queryset.first().status if self.fields['room'].queryset.exists() else None
-        if room_status == 'In-use/កំពុង​ប្រើ':
-            self.fields['room'].widget.attrs['class'] = 'in-use-room'
-        elif room_status == 'Available/ទំនេរ':
-            self.fields['room'].widget.attrs['class'] = 'available-room'
+class HouseOwnerForm(forms.ModelForm):
+    class Meta:
+        model = HouseOwner
+        fields = ['name']

@@ -3,12 +3,12 @@
 {% block content %}
 <div class="check-in-form-ctn" style="width:100;margin-top: 5vh;">
     <a href="{% url 'dashboard:CheckIn' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
-    <h2 style="text-align: center; margin: 15px 0 ;">Check-In Form</h2>
-    <form method="post" action="" lass="form"
+    <h2 style="text-align: center; margin: 15px 0 ;">Check-In client / ចុះឈ្មោះអតិថិជន</h2>
+    <form method="post" action="" class="form"
         style="border:1px solid green;padding:50px;width:700px;border-radius:5px; margin:auto; ">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Check-In</button>
+        <button type="submit" class="btn btn-primary">Check-In / ចុះឈ្មោះ</button>
     </form>
 </div>
 {% endblock %}

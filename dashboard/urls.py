@@ -15,6 +15,11 @@ urlpatterns = [
     #room
     path('add-room/', views.add_room, name='add_room'),
     path('room_list/', views.room_list, name='room_list'),
+
+    #house owner
+    path('house_owner/', views.house_owner, name='house_owner'),
+    path('house_owner/<int:pk>/edit/', views.HouseOwnerEditView.as_view(), name='house_owner_edit'),
+    
     #client
     path('client/', views.client, name='client'),
     path('client/list/', views.ClientListView.as_view(), name='client-list-class-based'),
@@ -26,6 +31,7 @@ urlpatterns = [
     #check-out
     path('checkout/', views.checkout_form_view, name='checkout_form_view'),
     path('CheckOut/', views.check_out, name='CheckOut'),
+
 
     #other fee
     path('other_fee/', views.other_fee, name='other_fee'),

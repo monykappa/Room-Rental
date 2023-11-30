@@ -24,6 +24,7 @@ from django.db.models import Max
 from datetime import timedelta
 from django.http import HttpResponse
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.views import View
 
 
 
@@ -56,8 +57,34 @@ def room_list(request):
     return render(request, 'dashboard/room_list.html', {'rooms': rooms, 'house_owners': house_owners})
 
 
+
+def house_owner(request):
+    house_owners = HouseOwner.objects.all().order_by('-id')
+    return render(request, 'dashboard/house_owner.html', {'house_owners': house_owners})
+
+class HouseOwnerEditView(UpdateView):
+    model = HouseOwner
+    form_class = HouseOwnerForm
+    template_name = 'your_app/house_owner_edit_form.html'
+    success_url = reverse_lazy('dashboard:house_owner')
+
+class HouseOwnerDeleteView(DeleteView):
+    model = HouseOwner
+    success_url = reverse_lazy('dashboard:house_owner')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        if self.request.is_ajax():
+            response_data = {'message': 'House owner deleted successfully!'}
+            return JsonResponse(response_data)
+        else:
+            return HttpResponseRedirect(self.get_success_url())
+
+
+
 def client(request):
-    clients = Client.objects.all()
+    clients = Client.objects.all().order_by('-id')
     return render(request, 'dashboard/client.html', {'clients': clients})
 
 class ClientListView(ListView):
@@ -69,7 +96,7 @@ class ClientEditView(UpdateView):
     model = Client
     form_class = ClientForm
     template_name = 'dashboard/client_edit_form.html'
-    success_url = reverse_lazy('dashboard:client-list-class-based')
+    success_url = reverse_lazy('dashboard:client')
     
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -91,7 +118,7 @@ class ClientDeleteView(DeleteView):
     success_url = reverse_lazy('dashboard:client-list-class-based')
 
 def check_in(request):
-    check_ins = CheckInModel.objects.all()
+    check_ins = CheckInModel.objects.all().order_by('-id') 
     return render(request, 'dashboard/check_in.html', {'CheckIn': check_ins})
 
 
@@ -122,7 +149,7 @@ def checkout_view(request, checkin_id):
 
 
 def check_out(request):
-    check_outs = CheckOut.objects.all()
+    check_outs = CheckOut.objects.all().order_by('-id') 
 
     for checkout in check_outs:
         try:
@@ -134,6 +161,7 @@ def check_out(request):
             checkout.checkin_date = None
 
     return render(request, 'dashboard/check_out.html', {'CheckOut': check_outs})
+
 
 
 def checkout_form_view(request):
