@@ -7,6 +7,7 @@
 }
 table{
     margin: auto;
+    margin-top: 2vh;
     width:100%;
     font-size: 18px;
     
@@ -24,3 +25,5 @@ tbody tr{
 tbody td{
     padding: 15px;
 }
+
+

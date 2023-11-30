@@ -22,6 +22,8 @@ from .models import CheckIn as CheckInModel
 from django.urls import reverse
 from django.db.models import Max
 from datetime import timedelta
+from django.http import HttpResponse
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 
 
@@ -99,7 +101,7 @@ def checkin_form(request):
         if form.is_valid():
             form.save()
             # Redirect to the check-in list page or any other page
-            return redirect('checkin_list')
+            return redirect('dashboard:CheckIn')
     else:
         form = CheckInForm()
 
@@ -118,6 +120,7 @@ def checkout_view(request, checkin_id):
 
     return redirect('dashboard:check_in') 
 
+
 def check_out(request):
     check_outs = CheckOut.objects.all()
 
@@ -131,3 +134,68 @@ def check_out(request):
             checkout.checkin_date = None
 
     return render(request, 'dashboard/check_out.html', {'CheckOut': check_outs})
+
+
+def checkout_form_view(request):
+    if request.method == 'POST':
+        form = check_out_form(request.POST)
+        if form.is_valid():
+            checkout_instance = form.save(commit=False)
+            
+            # Update the room status and save the checkout entry
+            checkout_instance.room.status = 'Available/ទំនេរ'
+            checkout_instance.room.save()
+            
+            # Automatically get the associated client of the selected room during check-in
+            checkin_entry = checkout_instance.room.check_in_entries.last()
+            
+            if checkin_entry and hasattr(checkin_entry, 'client_name'):
+                client_name = checkin_entry.client_name
+                # Assuming 'Client' has a field 'ClientName', modify if needed
+                client_instance, created = Client.objects.get_or_create(ClientName=client_name)
+                checkout_instance.ClientName = client_instance
+
+            checkout_instance.save()
+            return redirect('dashboard:CheckOut')
+    else:
+        form = check_out_form()
+
+    return render(request, 'dashboard/checkout_form.html', {'form': form})
+
+
+def other_fee(request):
+    trashes = Trash.objects.all()
+    parkings = parking.objects.all()
+
+    return render(request, 'dashboard/other_fee.html', {'trashes': trashes, 'parkings': parkings})
+
+
+def edit_trash(request, trash_id):
+    trash_instance = get_object_or_404(Trash, id=trash_id)
+    success_message = None
+
+    if request.method == 'POST':
+        new_price = request.POST.get('new_price')
+        trash_instance.TrashPrice = new_price
+        trash_instance.save()
+        success_message = "Trash price updated successfully"
+
+        # Redirect to the same page to fetch the updated data
+        return redirect('dashboard:other_fee')
+
+    return render(request, 'dashboard/other_fee.html', {'success_message': success_message})
+
+def edit_parking(request, parking_id):
+    parking_instance = get_object_or_404(parking, id=parking_id)
+    success_message = None
+
+    if request.method == 'POST':
+        new_price = request.POST.get('new_price')
+        parking_instance.ParkingPrice = new_price
+        parking_instance.save()
+        success_message = "Parking price updated successfully"
+
+        # Redirect to the same page to fetch the updated data
+        return redirect('dashboard:other_fee')
+
+    return render(request, 'dashboard/other_fee.html', {'success_message': success_message})

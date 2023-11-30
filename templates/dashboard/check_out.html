@@ -14,15 +14,16 @@ Check-Out / ថែ្ងចេញ
 
     <div class="check-out-ctn">
         <h2>Check-Out List / បញ្ជីចាកចេញ</h2>
-        <a href="">
-            <button type="button" class="btn btn-primary btn-check-in" style="margin: 10px 0;">+ Check-out / ចាកចេញ</button>
+        <a href="{% url 'dashboard:checkout_form_view' %}">
+            <button type="button" class="btn btn-primary btn-check-in" style="margin: 10px 0; background-color: green; border:none;">+ Check-out / ចាកចេញ</button>
         </a>
         <table>
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>ID</th>
                     <th>Client Name / ឈ្មោះអតិថិជន</th>
                     <th>Room​​ No / លេខ​បន្ទប់</th>
+                    <th>House Owner / ម្ចាស់ផ្ទះ </th>
                     <th>Check-In Date / កាលបរិច្ឆេទថែ្ងចូល</th>
                     <th>Check-Out Date / កាលបរិច្ឆេទថែ្ងចេញ</th>
                     <th>Total Stay / សរុបថែ្ងស្នាក់នៅ</th>
@@ -34,6 +35,7 @@ Check-Out / ថែ្ងចេញ
                     <td style="color:red;">{{ checkout.id }}</td>
                     <td>{{ checkout.ClientName.ClientName }}</td>
                     <td>{{ checkout.room.RoomNo }}</td>
+                    <td>{{ checkout.room.HouseOwner.name }}</td>
                     <td>{{ checkout.checkin_date|date:"Y-m-d" }}</td>
                     <td>{{ checkout.date|date:"Y-m-d" }}</td>
                     <td>{{ checkout.total_stay }} days/ថែ្ង</td>

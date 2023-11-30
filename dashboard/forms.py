@@ -2,6 +2,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
 from .models import *
+from django.utils.html import format_html
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -59,14 +60,27 @@ class CheckInForm(forms.ModelForm):
             Field('date', css_class='form-control mb-2'),
         )
 
-        
-class CheckOutForm(forms.ModelForm):
+
+
+class check_out_form(forms.ModelForm):
     class Meta:
         model = CheckOut
-        fields = ['ClientName', 'room']  # Include only the fields you want to display
+        fields = ['room', 'date']
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['ClientName'].widget.attrs['readonly'] = True  # Make the client name field read-only
-        self.fields['room'].widget.attrs['readonly'] = True  # Make the room field read-only
-        self.fields['room'].label = 'Room / បន្ទប់'  # Customize the label if needed
+        super(check_out_form, self).__init__(*args, **kwargs)
+
+        # Set the queryset for the 'room' field and order by status
+        if 'instance' in kwargs and kwargs['instance']:
+            # If the form is for an existing instance (edit mode), set the queryset based on the instance
+            self.fields['room'].queryset = room.objects.filter(pk=kwargs['instance'].room.pk)
+        else:
+            # If the form is for a new instance (create mode), set the queryset for all rooms and order by status
+            self.fields['room'].queryset = room.objects.all().order_by('status')
+
+        # Add a class to the 'room' field widget based on the room status
+        room_status = self.fields['room'].queryset.first().status if self.fields['room'].queryset.exists() else None
+        if room_status == 'In-use/កំពុង​ប្រើ':
+            self.fields['room'].widget.attrs['class'] = 'in-use-room'
+        elif room_status == 'Available/ទំនេរ':
+            self.fields['room'].widget.attrs['class'] = 'available-room'

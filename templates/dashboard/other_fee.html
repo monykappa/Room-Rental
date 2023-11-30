@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Other Fee
+{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/other_fee.css' %}">
+{% endblock css %}
+
+
+{% block content %}
+<style>
+    tbody td{
+        border: 1px solid grey;
+        padding: 5px;
+    }
+    thead th{
+        padding: 5px;
+        border: 1px solid grey;
+        width: 100px;
+    }
+    table{
+        font-size: 18px;
+        margin: 0 25px;
+    }
+    form input{
+        margin: 10px 0;
+    }
+</style>
+
+
+<div class="check-out-ctn" style="margin-top: 10vh;">
+    <h2 style="text-align: center; margin: 5vh 0;">Other Fee / ថ្លៃសេវាផ្សេងទៀត</h2>
+    <div class="table-ctn" style="display: flex; margin: auto; width:1200px;">
+
+        <!-- Trash Table -->
+        <table style="border: 1px solid grey; width: 600px;">
+            <thead>
+                <tr>
+                    <th>Trash Price / តម្លៃសំរាម</th>
+                    <th>Edit / កែសម្រួល</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trash in trashes %}
+                <tr>
+                    <td style="color:red;">${{ trash.TrashPrice }}</td>
+                    <td>
+                        <form method="post" action="{% url 'dashboard:edit_trash' trash.id %}">
+                            {% csrf_token %}
+                            <input type="text" name="new_price" placeholder="New Price" class="form-control">  <!-- Adjust as per your form structure -->
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Parking Table -->
+        <table style="border: 1px solid grey; width: 600px;">
+            <thead>
+                <tr>
+                    <th>Parking Price / តម្លៃចំណត</th>
+                    <th>Edit / កែសម្រួល</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for park in parkings %}
+                <tr>
+                    <td style="color:red;">${{ park.ParkingPrice }}</td>
+                    <td>
+                        <form method="post" action="{% url 'dashboard:edit_parking' park.id %}">
+                            {% csrf_token %}
+                            <input type="text" name="new_price" placeholder="New Price" class="form-control">  <!-- Adjust as per your form structure -->
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    <script>
+        console.log("Success Message:", "{% if success_message %}{{ success_message }}{% endif %}");
+    </script>
+    <script>
+        {% if success_message %}
+            alert("{{ success_message }}");
+        {% endif %}
+    </script>
+</div>
+
+
+{% endblock content %}

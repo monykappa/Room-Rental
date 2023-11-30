@@ -103,24 +103,23 @@ class room(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=AVAILABLE)
 
     def __str__(self):
-        return f'{self.RoomNo} - ${self.RoomFee} - Owner: {self.HouseOwner.name}'
-
-
-
+        return f'Room/បន្ទប់លេខ: {self.RoomNo} - {self.HouseOwner.name} - {self.status}'
 
 
 class CheckOut(models.Model):
     ClientName = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='checkouts')
-    room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkouts')
+    room = models.ForeignKey(room, on_delete=models.CASCADE, related_name='checkouts', null=True)
     date = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        self.room.status = 'Available/ទំនេរ'
-        self.room.save()
+        if self.room and hasattr(self.room, 'status'):
+            self.room.status = 'Available/ទំនេរ'
+            self.room.save()
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.ClientName} - Checked out from Room: {self.room.RoomNo}'
+        return f'{self.ClientName} - Checked out from Room: {self.room.RoomNo}' if self.room else f'{self.ClientName} - Checked out'
+
 
 
 class CheckIn(models.Model):
