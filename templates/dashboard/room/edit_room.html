@@ -1,5 +1,6 @@
-<!-- edit_room.html -->
+
 {% extends 'base.html' %}
+{% load static %}
 
 
 {% block title %}
@@ -46,7 +47,7 @@ Edit room / កែសម្រួលបន្ទប់
     <form method="post" action="">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Save changes</button>
+        <button type="submit" class="btn btn-success"><img src="{% static 'img/icons8-save-15.png' %}"> Save</button>
         <a href="{% url 'dashboard:room_list' %}" class="btn btn-danger">Cancel</a>
     </form>
 </div>

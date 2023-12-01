@@ -26,10 +26,32 @@ from django.http import HttpResponse
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views import View
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+def signin_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            # Redirect to a success page or any other page after login
+            return redirect('dashboard:dashboard')
+        else:
+            # Handle invalid login credentials
+            # You may customize this part based on your requirements
+            return render(request, 'userprofile/sign_in.html', {'error_message': 'Invalid username or password'})
+
+    return render(request, 'userprofile/sign_in.html')
 
 
+def logout_view(request):
+    logout(request)
+    return redirect('dashboard:signin') 
+
+@login_required
 def base(request):
     template = 'base.html'  
     return render(request, template)
@@ -62,7 +84,8 @@ def room_list(request):
     return render(request, 'dashboard/room/room_list.html', {'rooms': rooms, 'house_owners': house_owners})
 
 
-class RoomUpdateView(UpdateView):
+class RoomUpdateView(UpdateView, LoginRequiredMixin, View):
+    login_url = '/dashboard:signin_view/'
     model = room
     template_name = 'dashboard/room/edit_room.html'
     form_class = RoomForm  
@@ -127,7 +150,8 @@ class RoomUpdateView(UpdateView):
 
     success_url = reverse_lazy('dashboard:room_list')
 
-class RoomDeleteView(DeleteView):
+class RoomDeleteView(DeleteView, LoginRequiredMixin, View):
+    login_url = '/dashboard:signin_view/'
     model = room
     template_name = 'dashboard/room/delete_room.html'
     success_url = reverse_lazy('dashboard:room_list') 
@@ -148,7 +172,8 @@ def add_house_owner(request):
 
     return render(request, 'dashboard/house_owner/add_house_owner.html', {'form': form})
 
-class HouseOwnerEditView(View):
+class HouseOwnerEditView(View, LoginRequiredMixin):
+    login_url = '/dashboard:signin_view/'
     def get(self, request, pk):
         house_owner = get_object_or_404(HouseOwner, pk=pk)
         form = HouseOwnerForm(instance=house_owner)
@@ -168,7 +193,8 @@ class HouseOwnerEditView(View):
         return JsonResponse({'message': 'House owner deleted successfully.'})
     
 
-class HouseOwnerDeleteView(View):
+class HouseOwnerDeleteView(View, LoginRequiredMixin):
+    login_url = '/dashboard:signin_view/'
     def get(self, request, pk):
         house_owner = get_object_or_404(HouseOwner, pk=pk)
         return render(request, 'delete_template.html', {'house_owner': house_owner})
@@ -186,12 +212,14 @@ def client(request):
 
 
 
-class ClientListView(ListView):
+class ClientListView(ListView, LoginRequiredMixin, View):
+    login_url = '/dashboard:signin_view/'
     model = Client
     template_name = 'dashboard/client.html'
     context_object_name = 'clients'
 
-class ClientEditView(UpdateView):
+class ClientEditView(UpdateView, LoginRequiredMixin, View):
+    login_url = '/dashboard:signin_view/'
     model = Client
     form_class = ClientForm
     template_name = 'dashboard/client_edit_form.html'
@@ -221,7 +249,8 @@ class ClientEditView(UpdateView):
             return self.form_invalid(form)
 
 
-class ClientDeleteView(DeleteView):
+class ClientDeleteView(DeleteView, LoginRequiredMixin, View):
+    login_url = '/dashboard:signin_view/'
     model = Client
     template_name = 'dashboard/client_confirm_delete.html'
     success_url = reverse_lazy('dashboard:client-list-class-based')

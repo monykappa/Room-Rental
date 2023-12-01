@@ -23,3 +23,7 @@ tbody tr{
 tbody td{
     padding: 15px;
 }
+.sort-ctn{
+    display: flex;
+    padding: 10px;
+}

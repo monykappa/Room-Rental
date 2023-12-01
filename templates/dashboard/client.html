@@ -9,49 +9,89 @@
 Client
 {% endblock title %}
 
-<body>
-    {% block content %}
-    <div class="client-ctn">
-        <h2>Client List / បញ្ជីអតិថិជន</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID / ល.រ</th>
-                    <th>Client Name / ឈ្មោះអតិថិជន</th>
-                    <th>Address / អាស័យដ្ឋាន</th>
-                    <th>Contact / ទំនាក់ទំនង</th>
-                    <th>Remark / ចំណាំ</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for client in clients %}
-                <tr>
-                    <td style="color:red;">{{ client.id }}</td>
-                    <td data-field="ClientName">{{ client.ClientName }}</td>
-                    <td data-field="address">{{ client.address }}</td>
-                    <td data-field="contact">{{ client.contact }}</td>
-                    <td data-field="remark">{{ client.remark }}</td>
-                    <td>
-                        <a href="{% url 'dashboard:client-edit' client.pk %}" class="btn btn-primary"><img src="{% static 'img/icons8-edit-15.png' %}"> Edit</a>
-                        <a href="{% url 'dashboard:client-delete' client.pk %}" class="btn btn-danger"><img src="{% static 'img/icons8-delete-15.png' %}"> Delete</a>
-                    </td>
-                </tr>
+{% block content %}
 
-                {% endfor %}
-            </tbody>
-        </table>
+
+<div class="client-ctn">
+    <h2>Client List / បញ្ជីអតិថិជន</h2>
+    <div class="sort-ctn">
+        <label for="sortOrder">Sort by: </label>
+        <select id="sortOrder" class="form-select">
+            <option selected>select</option>
+            <option value="desc">Latest to Oldest</option>
+            <option value="asc">Oldest to Latest</option>
+        </select>
     </div>
 
-    <div class="edit-form-container" style="display: none;"></div>
 
-    {% endblock content %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID / ល.រ</th>
+                <th>Client Name / ឈ្មោះអតិថិជន</th>
+                <th>Address / អាស័យដ្ឋាន</th>
+                <th>Contact / ទំនាក់ទំនង</th>
+                <th>Remark / ចំណាំ</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td style="color:red;">{{ client.id }}</td>
+                <td data-field="ClientName">{{ client.ClientName }}</td>
+                <td data-field="address">{{ client.address }}</td>
+                <td data-field="contact">{{ client.contact }}</td>
+                <td data-field="remark">{{ client.remark }}</td>
+                <td>
+                    <a href="{% url 'dashboard:client-edit' client.pk %}" class="btn btn-primary"><img
+                            src="{% static 'img/icons8-edit-15.png' %}"> Edit</a>
+                    <a href="{% url 'dashboard:client-delete' client.pk %}" class="btn btn-danger"><img
+                            src="{% static 'img/icons8-delete-15.png' %}"> Delete</a>
+                </td>
+            </tr>
 
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-    <script>
+<div class="edit-form-container" style="display: none;"></div>
 
-$(document).ready(function () {
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var tbody = $('tbody');
+        var sortOrder = 'desc';
+
+        function sortTable() {
+            var rows = tbody.find('tr').toArray().sort(function (a, b) {
+                var idA = parseInt($(a).find('td:first').text());
+                var idB = parseInt($(b).find('td:first').text());
+                return sortOrder === 'asc' ? idA - idB : idB - idA;
+            });
+
+            tbody.empty();
+            $(rows).each(function () {
+                tbody.append(this);
+            });
+        }
+
+        sortTable();
+
+        $('#sortOrder').change(function () {
+            sortOrder = $(this).val();
+            sortTable();
+        });
+    });
+</script>
+{% endblock content %}
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
         $('.edit-client').click(function () {
             var pk = $(this).data('pk');
             $.ajax({
@@ -80,5 +120,4 @@ $(document).ready(function () {
         });
     });
 
-    </script>
-</body>
+</script>

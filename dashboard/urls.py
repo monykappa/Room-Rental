@@ -9,6 +9,13 @@ from django.contrib.auth.views import LogoutView
 
 app_name = 'dashboard'
 urlpatterns = [
+
+    #sign in 
+    path('signin/', views.signin_view, name='signin'),
+
+    #log out 
+    path('logout/', views.logout_view, name='logout'),
+
     # dashboard
     path('base/', views.base, name='base'),
     path('dashboard/', views.dashboard, name='dashboard'),
