@@ -14,7 +14,7 @@ Check-In / ថែ្ងចូល
     <div class="checkin-ctn">
         <h2>Check-In List / បញ្ជីចុះឈ្មោះចូល </h2>
         <a href="{% url 'dashboard:checkin_form' %}">
-            <button type="button" class="btn btn-primary btn-check-in" style="margin: 10px 0;">+ Check-In / ចុះឈ្មោះ</button>
+            <button type="button" class="btn btn-primary btn-check-in" style="margin: 10px 0;"><img src="{% static 'img/icons8-add-25.png' %}"> Check-In / ចុះឈ្មោះ</button>
         </a>
         <table>
             <thead>
@@ -34,7 +34,7 @@ Check-In / ថែ្ងចូល
                         <td>{{ checkin.client_name }}</td>
                         <td>{{ checkin.room.RoomNo }}</td>
                         <td>{{ checkin.room.HouseOwner }}</td>
-                        <td>${{ checkin.room.RoomFee }}</td>
+                        <td>${{ checkin.room.RoomFee|stringformat:"g"  }}</td>
                         <td>{{ checkin.date|date:"Y-m-d" }}</td>
                     </tr>
                 {% endfor %}

@@ -1,0 +1,53 @@
+<!-- edit_room.html -->
+{% extends 'base.html' %}
+
+
+{% block title %}
+Edit room / កែសម្រួលបន្ទប់
+{% endblock title %}
+{% block content %}
+
+<style>
+    .edit-room-ctn {
+        margin-top: 10vh;
+    }
+
+    form {
+        max-width: 600px;
+        margin: auto;
+        border: 1px solid green;
+        padding: 25px;
+        border-radius: 5px;
+        font-size: 20px;
+    }
+
+    form input {
+        padding: 5px;
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        form {
+            padding: 15px;
+        }
+
+        form input {
+            width: 100%;
+        }
+    }
+
+    h2 {
+        text-align: center;
+        margin: 5vh 0;
+    }
+</style>
+<div class="edit-room-ctn">
+    <h2>Edit Room / កែសម្រួលបន្ទប់</h2>
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save changes</button>
+        <a href="{% url 'dashboard:room_list' %}" class="btn btn-danger">Cancel</a>
+    </form>
+</div>
+{% endblock %}

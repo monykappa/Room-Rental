@@ -61,6 +61,16 @@ class Client(models.Model):
     def __str__(self):
         return self.ClientName
 
+    def save(self, *args, **kwargs):
+        super(Client, self).save(*args, **kwargs)
+        # Update associated CheckIn entries
+        self.checkin_set.update(client_name=self.ClientName)
+
+        
+    def update_checkin_entries(self):
+        checkin_entries = CheckIn.objects.filter(client=self)
+        checkin_entries.update(client_name=self.ClientName)
+
 
 
 class parking(models.Model):
@@ -82,9 +92,6 @@ class HouseOwner(models.Model):
 
     def __str__(self):
         return self.name
-
-
-
 
 
 class room(models.Model):
@@ -123,6 +130,7 @@ class CheckOut(models.Model):
 
 
 class CheckIn(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     client_name = models.CharField(max_length=200, null=True)
     client_address = models.CharField(max_length=500, choices=provinces.PROVINCE_CHOICES, null=True)
     client_contact = models.CharField(max_length=200, null=True)
@@ -138,9 +146,17 @@ class CheckIn(models.Model):
             address=self.client_address,
             contact=self.client_contact
         )
+
+        # Update the client information in the CheckIn instance
+        self.client_name = client.ClientName
+        self.client_address = client.address
+        self.client_contact = client.contact
+
+        # Save the room status and other changes
         self.room.status = 'In-use/កំពុង​ប្រើ'
         self.room.save()
         self.client = client
+
         super().save(*args, **kwargs)
     
     def has_checked_out(self):

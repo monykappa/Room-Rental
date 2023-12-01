@@ -2,33 +2,49 @@
 {% load static %}
 
 {% block title %}
-    Check Out Room
+Check Out Room
 {% endblock title %}
+
+{% block content %}
 <style>
-    
-    /* Add these styles to your CSS file */
-    .available-room {
-        background-color: green;
-        /* or any other style for available rooms */
+    form {
+        max-width: 600px;
+        margin: auto;
+        border: 1px solid green;
+        padding: 25px;
+        border-radius: 5px;
+        font-size: 20px;
     }
 
-    .in-use-room {
-        background-color: red;
-        /* or any other style for in-use rooms */
+    form input {
+        padding: 5px;
+        width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        form {
+            width:600px;
+            font-size: 14px;
+            padding: 15px;
+        }
+
+        form input {
+            width: 25%;
+        }
+    }
+
+    h2 {
+        text-align: center;
+        margin: 5vh 0;
     }
 </style>
-
-<body>
-    {% block content %}
-    <div class="checkouot-form-ctn" style="margin-top: 10vh;">
-        <a href="{% url 'dashboard:CheckIn' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
-        <h2 style="text-align: center; margin:5vh 0;">Checkout Room / ទូទាត់ចេញ</h2>
-    <form method="post" action="{% url 'dashboard:checkout_form_view' %}" style="margin:auto; width:600px;padding:5vh; border: 1px solid green; border-radius: 5px;">
+<div class="checkouot-form-ctn" style="margin-top: 10vh;">
+    <a href="{% url 'dashboard:CheckIn' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
+    <h2>Checkout Room / ទូទាត់ចេញ</h2>
+    <form method="post" action="{% url 'dashboard:checkout_form_view' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary btn-check-in" style="margin: 10px 0;">+ Check-out / ចាកចេញ</button>
     </form>
 </div>
-    {% endblock content %}
-    
-</body>
+{% endblock content %}

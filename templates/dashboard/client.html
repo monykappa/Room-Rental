@@ -16,12 +16,11 @@ Client
         <table>
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>ID / ល.រ</th>
                     <th>Client Name / ឈ្មោះអតិថិជន</th>
                     <th>Address / អាស័យដ្ឋាន</th>
                     <th>Contact / ទំនាក់ទំនង</th>
                     <th>Remark / ចំណាំ</th>
-                    <th>Edit / កែ</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -34,10 +33,8 @@ Client
                     <td data-field="contact">{{ client.contact }}</td>
                     <td data-field="remark">{{ client.remark }}</td>
                     <td>
-                        <a href="{% url 'dashboard:client-edit' client.pk %}">Edit</a>
-                    </td>
-                    <td>
-                        <a href="{% url 'dashboard:client-delete' client.pk %}">Delete</a>
+                        <a href="{% url 'dashboard:client-edit' client.pk %}" class="btn btn-primary"><img src="{% static 'img/icons8-edit-15.png' %}"> Edit</a>
+                        <a href="{% url 'dashboard:client-delete' client.pk %}" class="btn btn-danger"><img src="{% static 'img/icons8-delete-15.png' %}"> Delete</a>
                     </td>
                 </tr>
 

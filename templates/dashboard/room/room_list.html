@@ -10,11 +10,16 @@ Room-List/បញ្ជីបន្ទប់
 {% endblock title %}
 
 {% block content %}
+<style>
+    th.action {
+        width: 210px;
+    }
+</style>
 <div class="room-ctn">
     <h2>Room List / បញ្ជីបន្ទប់</h2>
     <div>
         <a href="{% url 'dashboard:add_room' %}">
-            <button class="btn btn-primary" style="margin:10px 0; background-color: green; border: none;">+ Add New Room
+            <button class="btn btn-primary" style="margin:10px 0; background-color: green; border: none;"><img src="{% static 'img/icons8-add-25.png' %}"> Add New Room
                 / បន្ថែមបន្ទប់ថ្មី</button>
         </a>
 
@@ -45,7 +50,7 @@ Room-List/បញ្ជីបន្ទប់
         <input type="text" id="search-room" placeholder="Enter room number" style="padding-left: 10px;">
     </div>
 
-    <table id="room-table" >
+    <table id="room-table">
         <thead>
             <tr>
                 <th>Room Number / លេខ​បន្ទប់</th>
@@ -54,6 +59,7 @@ Room-List/បញ្ជីបន្ទប់
                 <th>Client Name / ឈ្មោះអតិថិជន</th>
                 <th>Date Check-In / កាលបរិច្ឆេទថែ្ងចូល</th>
                 <th>Room Status / ស្ថានភាព​បន្ទប់</th>
+                <th class="action">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -61,7 +67,7 @@ Room-List/បញ្ជីបន្ទប់
             <tr>
                 <td>{{ room.RoomNo }}</td>
                 <td>{{ room.HouseOwner.name }}</td>
-                <td>${{ room.RoomFee }}</td>
+                <td>${{ room.RoomFee|stringformat:"g" }}</td>
                 <td>
                     {% if room.status == 'In-use/កំពុង​ប្រើ' %}
                     {% for checkin in room.check_in_entries.all %}
@@ -80,8 +86,17 @@ Room-List/បញ្ជីបន្ទប់
                     N/A
                     {% endif %}
                 </td>
-                <td style="background-color: {% if room.status == 'In-use/កំពុង​ប្រើ' %}red{% elif room.status == 'Available/ទំនេរ' %}green{% endif %}; color: white;">
+                <td
+                    style="background-color: {% if room.status == 'In-use/កំពុង​ប្រើ' %}red{% elif room.status == 'Available/ទំនេរ' %}green{% endif %}; color: white;">
                     {{ room.status }}
+                </td>
+                <td>
+                    <a href="{% url 'dashboard:edit_room' room.id %}">
+                        <button class="btn btn-primary" style="background-color: blue; border: none;"><img src="{% static 'img/icons8-edit-15.png' %}"> Edit</button>
+                    </a>
+                    <button class="btn btn-danger" style="background-color: red; border: none;"
+                        onclick="deleteRoom(this, {{ room.id }})"><img src="{% static 'img/icons8-delete-15.png' %}"> Delete</button>
+
                 </td>
             </tr>
             {% endfor %}
@@ -146,6 +161,61 @@ Room-List/បញ្ជីបន្ទប់
         }
     });
 </script>
+
+<script>
+    function deleteRoom(buttonElement, roomId) {
+        console.log('Deleting Room ID:', roomId);
+        var confirmDelete = confirm("Are you sure you want to delete this room?");
+        if (confirmDelete) {
+            fetch(`/delete_room/${roomId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            })
+                .then(response => {
+                    console.log('Full Response:', response);
+                    if (response.ok) {
+                        // Traverse up the DOM to find the row element and remove it
+                        var rowElement = buttonElement.closest('tr');
+                        if (rowElement) {
+                            rowElement.remove();
+                            alert('Room deleted successfully');
+                        } else {
+                            console.warn(`Row element for Room ID ${roomId} not found.`);
+                        }
+                        location.reload();  // Auto-refresh the page after successful deletion
+                    } else {
+                        throw new Error('Error deleting room');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting room:', error);
+                    alert('Error deleting room. Please try again.');
+                });
+        }
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+
+
 
 
 {% endblock %}

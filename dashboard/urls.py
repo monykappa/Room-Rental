@@ -15,10 +15,14 @@ urlpatterns = [
     #room
     path('add-room/', views.add_room, name='add_room'),
     path('room_list/', views.room_list, name='room_list'),
+    path('edit_room/<int:pk>/', views.RoomUpdateView.as_view(), name='edit_room'),
+    path('delete_room/<int:pk>/', views.RoomDeleteView.as_view(), name='delete_room'),
 
     #house owner
     path('house_owner/', views.house_owner, name='house_owner'),
-    path('house_owner/<int:pk>/edit/', views.HouseOwnerEditView.as_view(), name='house_owner_edit'),
+    path('add_house_owner/', views.add_house_owner, name='add_house_owner'),
+    path('house_owner_edit/<int:pk>/', views.HouseOwnerEditView.as_view(), name='house_owner_edit'),
+    path('house_owner/delete/<int:pk>/', views.HouseOwnerEditView.as_view(), name='house_owner_delete'),
     
     #client
     path('client/', views.client, name='client'),
