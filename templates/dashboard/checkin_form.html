@@ -42,7 +42,7 @@
     <form method="post" action="" class="form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Check-In / ចុះឈ្មោះ</button>
+        <button type="submit" class="btn btn-success"><img src="{% static 'img/icons8-check-in-20.png' %}"> Check-In / ចុះឈ្មោះ</button>
     </form>
 </div>
 {% endblock %}

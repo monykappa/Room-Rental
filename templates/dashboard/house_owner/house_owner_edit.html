@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block title %}
 Edit house owner
@@ -44,15 +44,14 @@ Edit house owner
     }
 </style>
 <div class="edit-house-owner-ctn" style="margin-top: 10vh;">
-    <a href="{% url 'dashboard:house_owner' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back /
-        ត្រឡប់​ក្រោយ</a>
+    <a href="{% url 'dashboard:house_owner' %}" class="btn btn-secondary mt-2" onclick="goBack()"><img src="{% static 'img/icons8-back-20.png' %}">Go back / ត្រឡប់​ក្រោយ</a>
     <h2>Edit House Owner</h2>
 
     <form method="post" action="{% url 'dashboard:house_owner_edit' pk=house_owner.id %}">
         {% csrf_token %}
         {{ form.as_p }}
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-success"><img src="{% static 'img/icons8-save-15.png' %}"> Save</button>
     </form>
 </div>
 

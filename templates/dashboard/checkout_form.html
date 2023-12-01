@@ -22,6 +22,9 @@ Check Out Room
     }
 
     @media (max-width: 768px) {
+        html{
+            font-size: 12px;
+        }
         form {
             width:600px;
             font-size: 14px;
@@ -39,12 +42,12 @@ Check Out Room
     }
 </style>
 <div class="checkouot-form-ctn" style="margin-top: 10vh;">
-    <a href="{% url 'dashboard:CheckIn' %}" class="btn btn-secondary mt-2" onclick="goBack()">Go back / ត្រឡប់​ក្រោយ</a>
+    <a href="{% url 'dashboard:CheckOut' %}" class="btn btn-secondary mt-2" onclick="goBack()"><img src="{% static 'img/icons8-back-20.png' %}"> Go back / ត្រឡប់​ក្រោយ</a>
     <h2>Checkout Room / ទូទាត់ចេញ</h2>
     <form method="post" action="{% url 'dashboard:checkout_form_view' %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary btn-check-in" style="margin: 10px 0;">+ Check-out / ចាកចេញ</button>
+        <button type="submit" class="btn btn-danger" style="margin: 10px 0;"><img src="{% static 'img/icons8-check-out-20.png' %}"> Check-out / ចាកចេញ</button>
     </form>
 </div>
 {% endblock content %}

@@ -41,11 +41,12 @@ Add new house owner
     }
 </style>
 <div class="add-house-owner-ctn" style="margin-top: 10vh;">
+    <a href="{% url 'dashboard:house_owner' %}" class="btn btn-secondary mt-2" onclick="goBack()"><img src="{% static 'img/icons8-back-20.png' %}">Go back / ត្រឡប់​ក្រោយ</a>
     <h2>Add New House Owner / បន្ថែមម្ចាស់ផ្ទះថ្មី</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Save</button>
+        <button type="submit" class="btn btn-success"><img src="{% static 'img/icons8-save-15.png' %}"> Save</button>
     </form>
 </div>
 {% endblock content %}
