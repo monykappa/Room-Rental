@@ -1,192 +1,128 @@
 {% load static %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap/fonts/icomoon/style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap/owl.carousel.min.css' %}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href=" {% static 'css/bootstrap/bootstrap.min.css' %}">
+
+    <!-- Style -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block css %}{% endblock %}
-    <title>{% block title %}Base{% endblock %}</title>
+    <title>{% block title %}Base1{% endblock %}</title>
 </head>
 
+<style>
+
+</style>
+
 <body>
-    <nav>
-        <div class="logo-name">
-            <div class="logo-image">
-                <img src="{% static 'img/icons8-room-64.png' %}" alt="">
-            </div>
-            <span class="logo_name">Room Rental</span>
-        </div>
-        <div class="menu-items">
-            <ul class="nav-links">
-                <li><a href="{% url 'dashboard:dashboard' %}">
-                        <i class="uil uil-estate"></i>
-                        <span class="link-name">Dahsboard / ផ្ទាំងគ្រប់គ្រង</span>
-                    </a></li>
-                <li><a href="{% url 'dashboard:CheckIn' %}">
-                        <i class="uil uil-files-landscapes"></i>
-                        <span class="link-name">Check-In / ថែ្ងចូល</span>
-                    </a></li>
-                <li><a href="{% url 'dashboard:CheckOut' %}">
-                        <i class="uil uil-files-landscapes"></i>
-                        <span class="link-name">Check-Out / ថែ្ងចេញ</span>
-                    </a></li>
-                <li><a href="{% url 'dashboard:room_list' %}">
-                        <i class="uil uil-files-landscapes"></i>
-                        <span class="link-name">Room / បន្ទប់</span>
-                    </a></li>
-                <li><a href="{% url 'dashboard:house_owner' %}">
-                        <i class="uil uil-files-landscapes"></i>
-                        <span class="link-name">House Owner / ម្ចាស់ផ្ទះ</span>
-                    </a></li>
-                <li><a href="#">
-                        <i class="uil uil-chart"></i>
-                        <span class="link-name">Monthly Fee / ថ្លៃ​សេវា​ប្រចាំ​ខែ</span>
-                    </a></li>
-                <li><a href="{% url 'dashboard:client' %}">
-                        <i class="uil uil-thumbs-up"></i>
-                        <span class="link-name">Client / អតិថិជន</span>
-                    </a></li>
-                <li><a href="{% url 'dashboard:other_fee' %}">
-                        <i class="uil uil-comments"></i>
-                        <span class="link-name">Other Fee / ថ្លៃសេវាផ្សេងទៀត។</span>
-                    </a></li>
-                <li><a href="#">
-                        <i class="uil uil-share"></i>
-                        <span class="link-name">Invoice / វិក្កយបត្រ</span>
-                    </a></li>
-            </ul>
 
-            <ul class="logout-mode">
-                <li>
-                    <a href="#">
-                        <i class="uil uil-user"></i>
-                        <span class="link-name">{{ request.user.username }}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'dashboard:logout' %}">
-                        <i class="uil uil-signout"></i>
-                        <span class="link-name">Logout</span>
-                    </a>
-                </li>
-                <li class="mode">
-                    <a href="#" id="darkModeToggle">
-                        <i class="uil uil-moon"></i>
-                        <span class="link-name">Toggle Mode</span>
-                    </a>
-                    <div class="mode-toggle">
-                        <span class="switch"></span>
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close mt-3">
+                <span class="icon-close2 js-menu-toggle" style="color:red;"><img
+                        src="{% static 'img/icons8-close-64.png' %}"></span>
+            </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+    </div>
+
+
+
+    <header class="site-navbar site-navbar-target py-4" role="banner">
+
+        <div class="container">
+            <div class="row align-items-center position-relative">
+
+                <div class="col-3">
+                    <div class="site-logo">
+                        <a href="index.html" class="font-weight-bold" style="color:red;">Brand</a>
                     </div>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <section class="dashboard">
-        <div class="top">
-            <i class="uil uil-bars sidebar-toggle"></i>
-            <div class="search-box">
-                <i class="uil uil-search"></i>
-                <input type="text" placeholder="Search here...">
+                </div>
+
+                <div class="col-9  text-right">
+
+
+                    <span class="d-inline-block d-lg-block"><a href="#"
+                            class="text-black site-menu-toggle js-menu-toggle py-5"><span
+                                class="icon-menu h3 text-white"></span><img src="{% static 'img/icons8-menu-64.png' %}">
+                        </a></span>
+
+                    <nav class="site-navigation text-right ml-auto d-none d-lg-none" role="navigation">
+                        <ul class="site-menu main-menu js-clone-nav ml-auto ">
+                            <li><a href="{% url 'dashboard:dashboard' %}">
+                                <img src="{% static 'img/menu-icon/icons8-dashboard-25.png' %}">
+                                    <span class="link-name">Dahsboard / ផ្ទាំងគ្រប់គ្រង</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:CheckIn' %}">
+                                <img src="{% static 'img/menu-icon/icons8-check-in-25.png' %}">
+                                    <span class="link-name">Check-In / ថែ្ងចូល</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:CheckOut' %}">
+                                <img src="{% static 'img/menu-icon/icons8-check-out-25.png' %}">
+                                    <span class="link-name">Check-Out / ថែ្ងចេញ</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:room_list' %}">
+                                <img src="{% static 'img/menu-icon/icons8-room-25.png' %}">
+                                    <span class="link-name">Room / បន្ទប់</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:house_owner' %}">
+                                <img src="{% static 'img/menu-icon/icons8-caretaker-25.png' %}">
+                                    <span class="link-name">House Owner / ម្ចាស់ផ្ទះ</span>
+                                </a></li>
+                            <li><a href="">
+                                <img src="{% static 'img/menu-icon/icons8-calendar-plus-25.png' %}">
+                                    <span class="link-name">Monthly Fee / ថ្លៃ​សេវា​ប្រចាំ​ខែ</span>
+                                </a></li>
+                            <li><a href="{% url 'dashboard:client' %}">
+                                <img src="{% static 'img/menu-icon/icons8-client-25.png' %}">
+                                    <span class="link-name">Client / អតិថិជន</span>
+                                </a></li>
+                            <li><a href="{% url 'dashboard:other_fee' %}">
+                                <img src="{% static 'img/menu-icon/icons8-other-25.png' %}">
+                                    <span class="link-name">Other Fee / ថ្លៃសេវាផ្សេងទៀត។</span>
+                                </a></li>
+                            <li><a href="">
+                                <img src="{% static 'img/menu-icon/icons8-invoice-25.png' %}">
+                                    <span class="link-name">Invoice / វិក្កយបត្រ</span>
+                                </a></li>
+                        </ul>
+                    </nav>
+                </div>
+
+
             </div>
-
+            
         </div>
-
-
         {% block content %}
-        <div class="dash-content">
-            <div class="overview">
-                <div class="title">
-                    <i class="uil uil-tachometer-fast-alt"></i>
-                    <span class="text">Dashboard</span>
-                </div>
-                <div class="boxes">
-                    <div class="box box1">
-                        <i class="uil uil-thumbs-up"></i>
-                        <span class="text">Total Likes</span>
-                        <span class="number">50,120</span>
-                    </div>
-                    <div class="box box2">
-                        <i class="uil uil-comments"></i>
-                        <span class="text">Comments</span>
-                        <span class="number">20,120</span>
-                    </div>
-                    <div class="box box3">
-                        <i class="uil uil-share"></i>
-                        <span class="text">Total Share</span>
-                        <span class="number">10,120</span>
-                    </div>
-                </div>
-            </div>
-            <div class="activity">
-                <div class="title">
-                    <i class="uil uil-clock-three"></i>
-                    <span class="text">Recent Activity</span>
-                </div>
-                <div class="activity-data">
-                    <div class="data names">
-                        <span class="data-title">Name</span>
-                        <span class="data-list">Prem Shahi</span>
-                        <span class="data-list">Deepa Chand</span>
-                        <span class="data-list">Manisha Chand</span>
-                        <span class="data-list">Pratima Shahi</span>
-                        <span class="data-list">Man Shahi</span>
-                        <span class="data-list">Ganesh Chand</span>
-                        <span class="data-list">Bikash Chand</span>
-                    </div>
-                    <div class="data email">
-                        <span class="data-title">Email</span>
-                        <span class="data-list">premshahi@gmail.com</span>
-                        <span class="data-list">deepachand@gmail.com</span>
-                        <span class="data-list">prakashhai@gmail.com</span>
-                        <span class="data-list">manishachand@gmail.com</span>
-                        <span class="data-list">pratimashhai@gmail.com</span>
-                        <span class="data-list">manshahi@gmail.com</span>
-                        <span class="data-list">ganeshchand@gmail.com</span>
-                    </div>
-                    <div class="data joined">
-                        <span class="data-title">Joined</span>
-                        <span class="data-list">2022-02-12</span>
-                        <span class="data-list">2022-02-12</span>
-                        <span class="data-list">2022-02-13</span>
-                        <span class="data-list">2022-02-13</span>
-                        <span class="data-list">2022-02-14</span>
-                        <span class="data-list">2022-02-14</span>
-                        <span class="data-list">2022-02-15</span>
-                    </div>
-                    <div class="data type">
-                        <span class="data-title">Type</span>
-                        <span class="data-list">New</span>
-                        <span class="data-list">Member</span>
-                        <span class="data-list">Member</span>
-                        <span class="data-list">New</span>
-                        <span class="data-list">Member</span>
-                        <span class="data-list">New</span>
-                        <span class="data-list">Member</span>
-                    </div>
-                    <div class="data status">
-                        <span class="data-title">Status</span>
-                        <span class="data-list">Liked</span>
-                        <span class="data-list">Liked</span>
-                        <span class="data-list">Liked</span>
-                        <span class="data-list">Liked</span>
-                        <span class="data-list">Liked</span>
-                        <span class="data-list">Liked</span>
-                        <span class="data-list">Liked</span>
-                    </div>
-                </div>
-            </div>
-            {% endblock content %}
-    </section>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <script src="{% static 'js/base.js' %}"></script>
+        {% endblock content %}
+
+    </header>
+
+
+
+
+    <script src=" {% static 'js/boostrap/jquery-3.3.1.min.js' %}"></script>
+    <script src=" {% static 'js/boostrap/popper.min.js' %}"></script>
+    <script src=" {% static 'js/boostrap/bootstrap.min.js' %}"></script>
+    <script src=" {% static 'js/boostrap/jquery.sticky.js' %}"></script>
+    <script src=" {% static 'js/boostrap/main.js' %}"></script>
     {% block js %}
     {% endblock js %}
 </body>

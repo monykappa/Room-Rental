@@ -25,7 +25,7 @@ Room-List/បញ្ជីបន្ទប់
 
         <label for="house-owner-filter">Sort by House Owner:</label>
         <select id="house-owner-filter">
-            <option value="">All</option>
+            <option value="">None</option>
             {% for house_owner in house_owners %}
             <option value="{{ house_owner.id }}">{{ house_owner.name }}</option>
             {% endfor %}
@@ -33,7 +33,7 @@ Room-List/បញ្ជីបន្ទប់
 
         <label for="room-status-filter">Sort by Room Status:</label>
         <select id="room-status-filter">
-            <option value="">All</option>
+            <option value="">None</option>
             <option value="In-use/កំពុង​ប្រើ">In-use</option>
             <option value="Available/ទំនេរ">Available</option>
             <!-- Add other room status options as needed -->
@@ -104,7 +104,6 @@ Room-List/បញ្ជីបន្ទប់
     </table>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     $(document).ready(function () {

@@ -37,7 +37,7 @@ Client
         </thead>
         <tbody>
             {% for client in clients %}
-            <tr>
+            <tr{% if client.id == request.GET.id %} class="highlight"{% endif %}>
                 <td style="color:red;">{{ client.id }}</td>
                 <td data-field="ClientName">{{ client.ClientName }}</td>
                 <td data-field="address">{{ client.address }}</td>
@@ -50,7 +50,6 @@ Client
                             src="{% static 'img/icons8-delete-15.png' %}"> Delete</a>
                 </td>
             </tr>
-
             {% endfor %}
         </tbody>
     </table>

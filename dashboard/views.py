@@ -394,3 +394,4 @@ def edit_parking(request, parking_id):
         return redirect('dashboard:other_fee')
 
     return render(request, 'dashboard/other_fee.html', {'success_message': success_message})
+

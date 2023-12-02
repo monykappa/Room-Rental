@@ -151,141 +151,130 @@ class CheckOutAdmin(admin.ModelAdmin):
     status.short_description = 'Status'
 
 
-class MonthlyRentalFeeForm(forms.ModelForm):
-    room_status = forms.CharField(label='Room Status', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+# class MonthlyRentalFeeForm(forms.ModelForm):
+#     room_status = forms.CharField(label='Room Status', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
-    class Meta:
-        model = MonthlyRentalFee
-        fields = '__all__'
+#     class Meta:
+#         model = MonthlyRentalFee
+#         fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
 
-        try:
-            # Attempt to get the room status
-            room_status = self.instance.room.status
-        except ObjectDoesNotExist:
-            # If room is not associated, set room status to 'N/A'
-            room_status = 'N/A'
+#         try:
+#             # Attempt to get the room status
+#             room_status = self.instance.room.status
+#         except ObjectDoesNotExist:
+#             # If room is not associated, set room status to 'N/A'
+#             room_status = 'N/A'
 
-        self.fields['room_status'].initial = room_status
+#         self.fields['room_status'].initial = room_status
 
-@admin.register(utilities)
-class UtilitiesAdmin(admin.ModelAdmin):
-    list_display = ('room', 'get_previous_water', 'other_fee', 'remark')
+# @admin.register(utilities)
+# class UtilitiesAdmin(admin.ModelAdmin):
+#     list_display = ('room', 'get_previous_water', 'other_fee', 'remark')
 
-    def get_previous_water(self, obj):
-        return f'{obj.current_water} m³'
+#     def get_previous_water(self, obj):
+#         return f'{obj.current_water} m³'
 
-    get_previous_water.short_description = 'Previous Water'
+#     get_previous_water.short_description = 'Previous Water'
 
-@admin.register(WaterUsageHistory)
-class WaterUsageHistoryAdmin(admin.ModelAdmin):
-    list_display = ('utilities_room', 'formatted_previous_water', 'date')
-    list_filter = ('utilities__room__HouseOwner',)
+# @admin.register(WaterUsageHistory)
+# class WaterUsageHistoryAdmin(admin.ModelAdmin):
+#     list_display = ('utilities_room', 'formatted_previous_water', 'date')
+#     list_filter = ('utilities__room__HouseOwner',)
 
-    def utilities_room(self, obj):
-        return f'Room {obj.utilities.room.RoomNo}' if obj.utilities and obj.utilities.room else ''
+#     def utilities_room(self, obj):
+#         return f'Room {obj.utilities.room.RoomNo}' if obj.utilities and obj.utilities.room else ''
 
-    utilities_room.short_description = 'Utilities Room'
+#     utilities_room.short_description = 'Utilities Room'
 
-    def formatted_previous_water(self, obj):
-        return f'{obj.previous_water} m³'
+#     def formatted_previous_water(self, obj):
+#         return f'{obj.previous_water} m³'
 
-    formatted_previous_water.short_description = 'Previous Water'
+#     formatted_previous_water.short_description = 'Previous Water'
 
     
 
-@admin.register(MonthlyRentalFee)
-class MonthlyRentalFeeAdmin(admin.ModelAdmin):
-    list_display = (
-        'checkin_client_name',
-        'room_no',
-        'house_owner',
-        'formatted_previous_water',
-        'formatted_current_water',
-        'formatted_water_fee',
-        'formatted_trash_price',
-        'formatted_parking_fee',
-        'formatted_room_fee',
-        'formatted_sub_total',
-        'date',
-    )
+# @admin.register(MonthlyRentalFee)
+# class MonthlyRentalFeeAdmin(admin.ModelAdmin):
+#     list_display = (
+#         'room_no',
+#         'house_owner',
+#         'formatted_previous_water',
+#         'formatted_current_water',
+#         'formatted_water_fee',
+#         'formatted_trash_price',
+#         'formatted_parking_fee',
+#         'formatted_room_fee',
+#         'formatted_sub_total',
+#         'date',
+#     )
 
-    list_filter = ('checkin__room__HouseOwner',)
-
-    def checkin_client_name(self, obj):
-        return obj.checkin.client_name if obj.checkin else ''
+#     def room_no(self, obj):
+#         return obj.utilities.room.RoomNo if obj.utilities and obj.utilities.room else ''
     
-    checkin_client_name.short_description = 'CheckIn Client Name'
+#     room_no.short_description = 'RoomNo'
 
-    def room_no(self, obj):
-        return obj.checkin.room.RoomNo if obj.checkin and obj.checkin.room else ''
+#     def room_status(self, obj):
+#         return obj.utilities.room.status if obj.utilities and obj.utilities.room else ''
     
-    room_no.short_description = 'RoomNo'
+#     room_status.short_description = 'Room Status'
 
-    def room_status(self, obj):
-        return obj.checkin.room.status if obj.checkin and obj.checkin.room else ''
+#     def house_owner(self, obj):
+#         return obj.utilities.room.HouseOwner.name if obj.utilities and obj.utilities.room and obj.utilities.room.HouseOwner else ''
     
-    room_status.short_description = 'Room Status'
+#     house_owner.short_description = 'HouseOwner'
 
+#     def formatted_previous_water(self, obj):
+#         if obj.utilities:
+#             # Fetch the MonthlyRentalFee entry for the month before the current MonthlyRentalFee entry
+#             previous_month_entry = MonthlyRentalFee.objects.filter(
+#                 utilities=obj.utilities,
+#                 date__lt=obj.date
+#             ).order_by('-date').first()
 
-    def house_owner(self, obj):
-        return obj.checkin.room.HouseOwner.name if obj.checkin and obj.checkin.room and obj.checkin.room.HouseOwner else ''
+#             if previous_month_entry:
+#                 return format_html('{} m³', int(float(previous_month_entry.current_water)) if float(previous_month_entry.current_water).is_integer() else float(previous_month_entry.current_water))
+#             else:
+#                 # If there's no history, display 0 m³
+#                 return format_html('{} m³', 0)
+
+#         return format_html('{} m³', 0)
+
+#     formatted_previous_water.short_description = 'Previous Water'
+
+#     def formatted_current_water(self, obj):
+#         current_water = obj.current_water
+#         return format_html('{} m³', int(float(current_water)) if float(current_water).is_integer() else float(current_water))
     
-    house_owner.short_description = 'HouseOwner'
+#     formatted_current_water.short_description = 'Current Water'
 
-    def formatted_previous_water(self, obj):
-        if obj.utilities:
-            # Fetch the MonthlyRentalFee entry for the month before the current MonthlyRentalFee entry
-            previous_month_entry = MonthlyRentalFee.objects.filter(
-                utilities=obj.utilities,
-                date__lt=obj.date
-            ).order_by('-date').first()
+#     def formatted_water_fee(self, obj):
+#         if obj.utilities:
+#             water_fee = (obj.current_water - obj.utilities.previous_water) * Decimal('0.5')
+#             return format_html('${}', '{:.0f}'.format(water_fee))
+#         return ''
 
-            if previous_month_entry:
-                return format_html('{} m³', int(float(previous_month_entry.current_water)) if float(previous_month_entry.current_water).is_integer() else float(previous_month_entry.current_water))
-            else:
-                # If there's no history, display 0 m³
-                return format_html('{} m³', 0)
+#     formatted_water_fee.short_description = 'Water Fee'
 
-        return format_html('{} m³', 0)
-
-
-
-    formatted_previous_water.short_description = 'Previous Water'
-
-    def formatted_current_water(self, obj):
-        current_water = obj.current_water
-        return format_html('{} m³', int(float(current_water)) if float(current_water).is_integer() else float(current_water))
+#     def formatted_trash_price(self, obj):
+#         return format_html('${}', int(float(obj.trash.TrashPrice)) if float(obj.trash.TrashPrice).is_integer() else float(obj.trash.TrashPrice)) if obj.trash else ''
     
-    formatted_current_water.short_description = 'Current Water'
+#     formatted_trash_price.short_description = 'Trash Price'
 
-    def formatted_water_fee(self, obj):
-        if obj.utilities:
-            water_fee = (obj.current_water - obj.utilities.previous_water) * Decimal('0.5')
-            return format_html('${}', '{:.0f}'.format(water_fee))
-        return ''
-
-    formatted_water_fee.short_description = 'Water Fee'
-
-    def formatted_trash_price(self, obj):
-        return format_html('${}', int(float(obj.trash.TrashPrice)) if float(obj.trash.TrashPrice).is_integer() else float(obj.trash.TrashPrice)) if obj.trash else ''
+#     def formatted_parking_fee(self, obj):
+#         return format_html('${}', int(float(obj.parking.ParkingPrice)) if float(obj.parking.ParkingPrice).is_integer() else float(obj.parking.ParkingPrice)) if obj.parking else ''
     
-    formatted_trash_price.short_description = 'Trash Price'
+#     formatted_parking_fee.short_description = 'Parking Fee'
 
-    def formatted_parking_fee(self, obj):
-        return format_html('${}', int(float(obj.parking.ParkingPrice)) if float(obj.parking.ParkingPrice).is_integer() else float(obj.parking.ParkingPrice)) if obj.parking else ''
+#     def formatted_room_fee(self, obj):
+#         return format_html('${}', int(float(obj.utilities.room.RoomFee)) if float(obj.utilities.room.RoomFee).is_integer() else float(obj.utilities.room.RoomFee)) if obj.utilities and obj.utilities.room and obj.utilities.room.RoomFee else ''
     
-    formatted_parking_fee.short_description = 'Parking Fee'
+#     formatted_room_fee.short_description = 'Room Fee'
 
-    def formatted_room_fee(self, obj):
-        return format_html('${}', int(float(obj.checkin.room.RoomFee)) if float(obj.checkin.room.RoomFee).is_integer() else float(obj.checkin.room.RoomFee)) if obj.checkin and obj.checkin.room and obj.checkin.room.RoomFee else ''
+#     def formatted_sub_total(self, obj):
+#         total_fee = obj.sub_total
+#         return format_html('${}', int(float(total_fee)) if float(total_fee).is_integer() else float(total_fee))
     
-    formatted_room_fee.short_description = 'Room Fee'
-
-    def formatted_sub_total(self, obj):
-        total_fee = obj.sub_total
-        return format_html('${}', int(float(total_fee)) if float(total_fee).is_integer() else float(total_fee))
-    
-    formatted_sub_total.short_description = 'Sub Total'
+#     formatted_sub_total.short_description = 'Sub Total'

@@ -49,7 +49,10 @@ urlpatterns = [
     path('edit_trash/<int:trash_id>/', views.edit_trash, name='edit_trash'),
     path('edit_parking/<int:parking_id>/', views.edit_parking, name='edit_parking'),
 
-    
+    #monthly
+    # path('monthly-fee-input/', views.monthly_fee_input, name='monthly_fee_input'),
+    # path('save-monthly-fee/', views.save_monthly_fee, name='save_monthly_fee'),
+    # path('invoice/<int:invoice_id>/', views.invoice_detail, name='invoice_detail'),
 ]
 
 if settings.DEBUG:
