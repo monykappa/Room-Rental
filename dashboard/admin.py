@@ -151,6 +151,29 @@ class CheckOutAdmin(admin.ModelAdmin):
     status.short_description = 'Status'
 
 
+class UtilitiesAdmin(admin.ModelAdmin):
+    list_display = ('room_no', 'house_owner', 'water_quantity', 'date')
+
+    def room_no(self, obj):
+        return obj.room.RoomNo
+
+    def house_owner(self, obj):
+        return obj.room.HouseOwner.name
+
+admin.site.register(Utilities, UtilitiesAdmin)
+admin.site.register(WaterRate)
+
+class MonthlyRentalFeeAdmin(admin.ModelAdmin):
+    list_display = ('room_no', 'date', 'current_water', 'water_fee', 'trash_fee', 'park_fee', 'total_fee')
+
+    def room_no(self, obj):
+        return obj.room.RoomNo
+
+    def total_fee(self, obj):
+        return obj.calculate_water_cost() + obj.trash_fee + obj.park_fee + obj.room.RoomFee
+
+admin.site.register(MonthlyRentalFee, MonthlyRentalFeeAdmin)
+
 # class MonthlyRentalFeeForm(forms.ModelForm):
 #     room_status = forms.CharField(label='Room Status', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 

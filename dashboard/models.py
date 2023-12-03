@@ -165,7 +165,51 @@ class CheckIn(models.Model):
     def __str__(self):
         return f'{self.client_name} - Room: {self.room.RoomNo} - Fee: ${self.room.RoomFee}'
     
-    
+
+
+class WaterRate(models.Model):
+    rate = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'Water Rate: ${self.rate} per unit'
+
+class Utilities(models.Model):
+    room = models.OneToOneField('room', on_delete=models.CASCADE, related_name='utilities')
+    water_quantity = models.PositiveIntegerField(default=0)
+    water_rate = models.ForeignKey(WaterRate, on_delete=models.SET_NULL, null=True)
+    date = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f'Utilities for {self.room}'
+
+class MonthlyRentalFee(models.Model):
+    room = models.ForeignKey('room', on_delete=models.CASCADE, related_name='monthly_fees')
+    date = models.DateField(default=timezone.now)
+    current_water = models.PositiveIntegerField(blank=True, null=True)
+    water_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    trash_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    park_fee = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def calculate_total_fee(self):
+        return self.water_fee + self.trash_fee + self.park_fee + self.room.RoomFee
+
+    def calculate_water_cost(self):
+        utilities, created = Utilities.objects.get_or_create(room=self.room)
+        previous_water_quantity = utilities.water_quantity
+        water_quantity_difference = self.current_water - previous_water_quantity if previous_water_quantity is not None else self.current_water
+
+        # Update the Utilities model's water_quantity
+        utilities.water_quantity = self.current_water
+        utilities.save()
+
+        return water_quantity_difference * utilities.water_rate.rate
+
+    def save(self, *args, **kwargs):
+        self.water_fee = self.calculate_water_cost()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.room} - {self.date}'
 
 
 # class utilities(models.Model):
