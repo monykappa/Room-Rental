@@ -31,11 +31,16 @@
     <div class="site-mobile-menu site-navbar-target">
         <div class="site-mobile-menu-header">
             <div class="site-mobile-menu-close mt-3">
+
                 <span class="icon-close2 js-menu-toggle" style="color:red;"><img
                         src="{% static 'img/icons8-close-64.png' %}"></span>
             </div>
+    
+
         </div>
-        <div class="site-mobile-menu-body"></div>
+
+        <div class="site-mobile-menu-body">
+        </div>
     </div>
 
 
@@ -46,8 +51,12 @@
             <div class="row align-items-center position-relative">
 
                 <div class="col-3">
+
                     <div class="site-logo">
-                        <a href="index.html" class="font-weight-bold" style="color:red;">Brand</a>
+                        <img src="{% static 'img/icons8-house-48.png' %}">
+                        <a href="{% url 'dashboard:dashboard' %}" class="font-weight-bold" style="color:black;">Room
+                            Rental</a>
+
                     </div>
                 </div>
 
@@ -62,59 +71,68 @@
                     <nav class="site-navigation text-right ml-auto d-none d-lg-none" role="navigation">
                         <ul class="site-menu main-menu js-clone-nav ml-auto ">
                             <li><a href="{% url 'dashboard:dashboard' %}">
-                                <img src="{% static 'img/menu-icon/icons8-dashboard-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-dashboard-25.png' %}">
                                     <span class="link-name">Dahsboard / ផ្ទាំងគ្រប់គ្រង</span>
                                 </a></li>
 
                             <li><a href="{% url 'dashboard:CheckIn' %}">
-                                <img src="{% static 'img/menu-icon/icons8-check-in-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-check-in-25.png' %}">
                                     <span class="link-name">Check-In / ថែ្ងចូល</span>
                                 </a></li>
 
                             <li><a href="{% url 'dashboard:CheckOut' %}">
-                                <img src="{% static 'img/menu-icon/icons8-check-out-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-check-out-25.png' %}">
                                     <span class="link-name">Check-Out / ថែ្ងចេញ</span>
                                 </a></li>
 
                             <li><a href="{% url 'dashboard:room_list' %}">
-                                <img src="{% static 'img/menu-icon/icons8-room-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-room-25.png' %}">
                                     <span class="link-name">Room / បន្ទប់</span>
                                 </a></li>
 
                             <li><a href="{% url 'dashboard:house_owner' %}">
-                                <img src="{% static 'img/menu-icon/icons8-caretaker-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-caretaker-25.png' %}">
                                     <span class="link-name">House Owner / ម្ចាស់ផ្ទះ</span>
                                 </a></li>
                             <li><a href="">
-                                <img src="{% static 'img/menu-icon/icons8-calendar-plus-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-calendar-plus-25.png' %}">
                                     <span class="link-name">Monthly Fee / ថ្លៃ​សេវា​ប្រចាំ​ខែ</span>
                                 </a></li>
                             <li><a href="{% url 'dashboard:client' %}">
-                                <img src="{% static 'img/menu-icon/icons8-client-25.png' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-client-25.png' %}">
                                     <span class="link-name">Client / អតិថិជន</span>
                                 </a></li>
                             <li><a href="{% url 'dashboard:other_fee' %}">
-                                <img src="{% static 'img/menu-icon/icons8-other-25.png' %}">
-                                    <span class="link-name">Other Fee / ថ្លៃសេវាផ្សេងទៀត។</span>
+                                    <img src="{% static 'img/menu-icon/icons8-other-25.png' %}">
+                                    <span class="link-name">Other Fee / ថ្លៃសេវាផ្សេងទៀត</span>
                                 </a></li>
-                            <li><a href="">
-                                <img src="{% static 'img/menu-icon/icons8-invoice-25.png' %}">
+                            <li style="margin-bottom: 5vh;"><a href="">
+                                    <img src="{% static 'img/menu-icon/icons8-invoice-25.png' %}">
                                     <span class="link-name">Invoice / វិក្កយបត្រ</span>
                                 </a></li>
+                                <div class="account-ctn">
+                                    <a href="" class="user">{{ request.user.username }}</a>
+                                    <a href="{% url 'dashboard:logout' %}" class="btn btn-danger text-white">Logout</a>
+                                </div>
                         </ul>
+
                     </nav>
                 </div>
 
 
             </div>
-            
+
+
         </div>
+
+
+    </header>
+    <div class="ctn-content" style="left: 5%; right:5%; margin-top: 15vh; position: absolute;">
+
         {% block content %}
 
         {% endblock content %}
-
-    </header>
-
+    </div>
 
 
 

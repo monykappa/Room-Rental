@@ -1,15 +1,39 @@
-html{
+html {
     font-size: 14px;
 }
+
 body {
     font-family: "Poppins";
     background-color: #fff;
     height: 200vh;
     position: relative;
 }
-ul li{
-    border-bottom: 1px solid grey;
-    margin:5px 0;
+
+.account-ctn{
+    width: 250px;
+    display: flex;
+    justify-content: space-between;
+}
+.account-ctn a.user{
+    text-decoration: underline !important;
+}
+ul li {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.363);
+    margin: 0;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 0 rgb(231, 175, 175);
+    -webkit-transition: ease-out 0.4s;
+    -moz-transition: ease-out 0.4s;
+    transition: ease-out 0.4s;
+}
+
+ul li:hover {
+    color: white;
+    box-shadow: inset 400px 0 0 0 rgb(236, 209, 209);
+}
+
+header {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.274);
 }
 
 body:before {
@@ -289,7 +313,7 @@ a:hover {
 }
 
 .site-mobile-menu {
-    width: 300px;
+    width: 350px;
     position: fixed;
     right: 0;
     z-index: 2000;
@@ -383,7 +407,7 @@ a:hover {
 }
 
 .site-mobile-menu .site-nav-wrap a:hover {
-    color: #007bff;
+    color: #000;
 }
 
 .site-mobile-menu .site-nav-wrap li {
@@ -447,6 +471,7 @@ a:hover {
 .site-mobile-menu .site-nav-wrap>li>a {
     padding-left: 20px;
     font-size: 16px;
+    margin: 5px 0;
 }
 
 .site-mobile-menu .site-nav-wrap>li>ul {
@@ -458,13 +483,13 @@ a:hover {
 
 .site-mobile-menu .site-nav-wrap>li>ul>li {
     display: block;
-    
+
 }
 
 .site-mobile-menu .site-nav-wrap>li>ul>li>a {
     padding-left: 40px;
     font-size: 16px;
-    
+
 }
 
 .site-mobile-menu .site-nav-wrap>li>ul>li>ul {
@@ -524,7 +549,7 @@ a:hover {
 
 .sticky-wrapper .site-navbar ul li a.active {
     color: #000 !important;
-    
+
 }
 
 .sticky-wrapper.is-sticky .site-navbar {
@@ -539,7 +564,7 @@ a:hover {
 
 .sticky-wrapper.is-sticky .site-navbar ul li a {
     color: #000 !important;
-    
+
 }
 
 .sticky-wrapper.is-sticky .site-navbar ul li a.active {

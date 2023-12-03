@@ -11,12 +11,12 @@
 </head>
 <style>
     body {
-    background-color: rgb(88, 85, 85);
+    background-color: #fff;
+    font-family: 'Poppins';
 
     }
 
     html {
-        font-family: 'Poppins';
         font-size: 18px;
 
     }
@@ -42,10 +42,10 @@
     max-width: 500px;
     margin: auto;
     padding: 5vh;
-    border: 1px solid white;
+    border: 1px solid rgb(10, 10, 10);
     border-radius: 5px;
-    backdrop-filter: blur(5px); /* Adjust the blur strength as needed */
-    background-color: rgba(255, 255, 255, 0.5); /* Adjust the alpha value for transparency */
+    backdrop-filter: blur(1px); /* Adjust the blur strength as needed */
+    background-color: rgba(166, 172, 172, 0.116); /* Adjust the alpha value for transparency */
 }
 @media (max-width:767px){
     form {
@@ -58,6 +58,7 @@
         width: 100%;
         display: block;
         margin: 20px 0;
+
     }
 
     button {
@@ -67,6 +68,7 @@
 
 <body>
     <div class="ctn">
+        <h1>Room Rental</h1>
         <div class="sign-in-ctn">
             <form method="post" action="{% url 'dashboard:signin' %}">
                 <h1 class="h3 mb-3 font-weight-normal">Sign in / ចូលគណនី</h1>
