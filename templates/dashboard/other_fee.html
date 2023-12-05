@@ -2,30 +2,44 @@
 {% load static %}
 
 {% block title %}
-    Other Fee
+Other Fee
 {% endblock title %}
 
-{% block css %}
-    <link rel="stylesheet" href="{% static 'css/other_fee.css' %}">
-{% endblock css %}
 
 
 {% block content %}
 <style>
-    tbody td{
+    tbody td {
         border: 1px solid grey;
         padding: 5px;
     }
-    thead th{
-        padding: 5px;
-        border: 1px solid grey;
+
+    thead th {
+        padding: 15px;
+        border: 1px solid #fff;
         width: 100px;
     }
-    table{
+
+    thead {
+        background-color: rgb(47, 11, 104);
+        color: white;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: rgb(224, 213, 241);
+
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: rgb(209, 185, 245);
+    }
+
+    table {
         font-size: 18px;
         margin: 0 25px;
     }
-    form input{
+
+    form input {
         margin: 10px 0;
     }
 </style>
@@ -46,14 +60,15 @@
             <tbody>
                 {% for trash in trashes %}
                 <tr>
-                    <td style="color:red;">${{ trash.TrashPrice }}</td>
+                    <td>${{ trash.TrashPrice }}</td>
                     <td>
                         <form method="post" action="{% url 'dashboard:edit_trash' trash.id %}">
                             {% csrf_token %}
-                            <input type="text" name="new_price" placeholder="New Price" class="form-control">  <!-- Adjust as per your form structure -->
+                            <input type="text" name="new_price" placeholder="New Price" class="form-control">
+                            <!-- Adjust as per your form structure -->
                             <button type="submit" class="btn btn-success">Save</button>
                         </form>
-                        
+
                     </td>
                 </tr>
                 {% endfor %}
@@ -71,14 +86,15 @@
             <tbody>
                 {% for park in parkings %}
                 <tr>
-                    <td style="color:red;">${{ park.ParkingPrice }}</td>
+                    <td>${{ park.ParkingPrice }}</td>
                     <td>
                         <form method="post" action="{% url 'dashboard:edit_parking' park.id %}">
                             {% csrf_token %}
-                            <input type="text" name="new_price" placeholder="New Price" class="form-control">  <!-- Adjust as per your form structure -->
+                            <input type="text" name="new_price" placeholder="New Price" class="form-control">
+                            <!-- Adjust as per your form structure -->
                             <button type="submit" class="btn btn-success">Save</button>
                         </form>
-                        
+
                     </td>
                 </tr>
                 {% endfor %}
@@ -91,7 +107,7 @@
     </script>
     <script>
         {% if success_message %}
-            alert("{{ success_message }}");
+        alert("{{ success_message }}");
         {% endif %}
     </script>
 </div>

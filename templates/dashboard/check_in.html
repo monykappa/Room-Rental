@@ -30,9 +30,9 @@ Check-In / ថែ្ងចូល
             <tbody>
                 {% for checkin in CheckIn %}
                     <tr>
-                        <td style="color:red;">{{ checkin.id }}</td>
-                        <td data-field="ClientName">
-                            <a href="{% url 'dashboard:client-edit' pk=checkin.client_id %}">{{ checkin.client_name }}</a>
+                        <td style="color:rgb(241, 0, 0); font-weight: 500;">{{ checkin.id }}</td>
+                        <td data-field="ClientName" >
+                            <a href="{% url 'dashboard:client-edit' pk=checkin.client_id %}" class="client-name">{{ checkin.client_name }}</a>
                         </td>
                         <td>{{ checkin.room.RoomNo }}</td>
                         <td>{{ checkin.room.HouseOwner }}</td>

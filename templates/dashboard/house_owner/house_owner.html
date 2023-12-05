@@ -9,8 +9,25 @@ House Owner / ម្ចាស់ផ្ទះ
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <style>
+    body{
+        font-family: 'Poppins';
+    }
     .house-owner-ctn {
         margin-top: 10vh;
+    }
+
+    thead {
+        background-color: rgb(47, 11, 104);
+        color: white;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: rgb(224, 213, 241);
+
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: rgb(209, 185, 245);
     }
 
     table {
@@ -21,6 +38,7 @@ House Owner / ម្ចាស់ផ្ទះ
 
     thead th {
         padding: 15px;
+        border:1px solid #fff;
     }
 
     thead tr {
@@ -39,12 +57,14 @@ House Owner / ម្ចាស់ផ្ទះ
     h2 {
         margin: 15px 0;
     }
+
 </style>
 
 <div class="house-owner-ctn">
     <h2>House Owner List / បញ្ជីឈ្មោះម្ចាស់ផ្ទះ</h2>
     <a href="{% url 'dashboard:add_house_owner' %}">
-        <button class="btn btn-primary" style="margin:2vh 0; background-color: green; border: none;"><img src="{% static 'img/icons8-add-25.png' %}"> Add New House Owner / បន្ថែមម្ចាស់ផ្ទះថ្មី</button>
+        <button class="btn btn-primary" style="margin:2vh 0; background-color: green; border: none;"><img
+                src="{% static 'img/icons8-add-25.png' %}"> Add New House Owner / បន្ថែមម្ចាស់ផ្ទះថ្មី</button>
     </a>
     <table>
         <thead>
@@ -57,14 +77,16 @@ House Owner / ម្ចាស់ផ្ទះ
         <tbody>
             {% for house_owner in house_owners %}
             <tr>
-                <td style="color:red;">{{ house_owner.id }}</td>
+                <td style="color:red; font-weight: 500;">{{ house_owner.id }}</td>
                 <td data-field="ClientName">
                     <span class="editable" data-id="{{ house_owner.id }}">{{ house_owner.name }}</span>
                     <input type="text" class="edit-input" data-id="{{ house_owner.id }}" style="display: none;">
                 </td>
                 <td>
-                    <a href="{% url 'dashboard:house_owner_edit' pk=house_owner.id %}" class="btn btn-primary"> <img src="{% static 'img/icons8-edit-15.png' %}">Edit</a>
-                    <button class="btn btn-danger btn-delete" data-id="{{ house_owner.id }}"><img src="{% static 'img/icons8-delete-15.png' %}"> Delete</button>
+                    <a href="{% url 'dashboard:house_owner_edit' pk=house_owner.id %}" class="btn btn-primary"> <img
+                            src="{% static 'img/icons8-edit-15.png' %}">Edit</a>
+                    <button class="btn btn-danger btn-delete" data-id="{{ house_owner.id }}"><img
+                            src="{% static 'img/icons8-delete-15.png' %}"> Delete</button>
 
 
 
@@ -80,8 +102,8 @@ House Owner / ម្ចាស់ផ្ទះ
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
+<script>
+    $(document).ready(function () {
         function deleteHouseOwner(buttonElement, houseOwnerId) {
             console.log('Deleting House Owner ID:', houseOwnerId);
             console.log('Constructed URL:', `/house_owner/delete/${houseOwnerId}/`);
@@ -145,7 +167,7 @@ House Owner / ម្ចាស់ផ្ទះ
             });
         });
     });
-    </script>
+</script>
 
 
 
