@@ -23,6 +23,9 @@ def images_directory_path(instance, filename):
     directory_path = f'content/{unique_id}/'
     return os.path.join(directory_path, filename)
 
+
+
+
 class provinces(models.Model):
     PROVINCE_CHOICES = [
         ('Banteay Meanchey', 'Banteay Meanchey'),
@@ -52,8 +55,16 @@ class provinces(models.Model):
         ('Tbong Khmum', 'Tbong Khmum'),
     ]
 
+
+class Person(models.Model):
+    SEX_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
+
 class Client(models.Model):
     ClientName = models.CharField(max_length=200)
+    sex = models.CharField(max_length=1, choices=Person.SEX_CHOICES, null=True, blank=True)
     address = models.CharField(max_length=500, choices=provinces.PROVINCE_CHOICES)
     contact = models.CharField(max_length=200)
     remark = models.CharField(max_length=200, null=True, blank=True)
@@ -70,6 +81,7 @@ class Client(models.Model):
     def update_checkin_entries(self):
         checkin_entries = CheckIn.objects.filter(client=self)
         checkin_entries.update(client_name=self.ClientName)
+
 
 
 

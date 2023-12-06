@@ -7,7 +7,7 @@ from django.utils.html import format_html
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = ['ClientName', 'address', 'contact', 'remark']
+        fields = ['ClientName', 'sex', 'address', 'contact', 'remark']
 
 
 class HouseOwnerForm(forms.ModelForm):

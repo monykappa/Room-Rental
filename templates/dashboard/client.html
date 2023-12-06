@@ -29,6 +29,7 @@ Client
             <tr>
                 <th>ID / ល.រ</th>
                 <th>Client Name / ឈ្មោះអតិថិជន</th>
+                <th>Sex</th>
                 <th>Address / អាស័យដ្ឋាន</th>
                 <th>Contact / ទំនាក់ទំនង</th>
                 <th>Remark / ចំណាំ</th>
@@ -40,6 +41,7 @@ Client
             <tr{% if client.id == request.GET.id %} class="highlight"{% endif %}>
                 <td style="color:red; font-weight: 500;">{{ client.id }}</td>
                 <td data-field="ClientName">{{ client.ClientName }}</td>
+                <td data-field="sex">{{ client.sex }}</td>
                 <td data-field="address">{{ client.address }}</td>
                 <td data-field="contact">{{ client.contact }}</td>
                 <td data-field="remark">{{ client.remark }}</td>
