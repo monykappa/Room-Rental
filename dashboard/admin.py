@@ -152,7 +152,7 @@ class CheckOutAdmin(admin.ModelAdmin):
 
 
 class UtilitiesAdmin(admin.ModelAdmin):
-    list_display = ('room_no', 'house_owner', 'water_quantity', 'date')
+    list_display = ('room_no', 'house_owner', 'current_water','previous_water', 'date')
 
     def room_no(self, obj):
         return obj.room.RoomNo
@@ -164,15 +164,26 @@ admin.site.register(Utilities, UtilitiesAdmin)
 admin.site.register(WaterRate)
 
 class MonthlyRentalFeeAdmin(admin.ModelAdmin):
-    list_display = ('room_no', 'date', 'current_water', 'water_fee', 'trash_fee', 'park_fee', 'total_fee')
+    list_display = ('room_no', 'date', 'get_current_water', 'water_fee', 'trash_fee', 'park_fee', 'total_fee')
 
     def room_no(self, obj):
         return obj.room.RoomNo
 
+    def get_current_water(self, obj):
+        # Retrieve the latest WaterUsage entry
+        try:
+            latest_water_usage = WaterUsage.objects.filter(room=obj.room).latest('date')
+            return latest_water_usage.water_quantity
+        except WaterUsage.DoesNotExist:
+            return None
+
     def total_fee(self, obj):
         return obj.water_fee + obj.trash_fee + obj.park_fee + obj.room.RoomFee
 
+    get_current_water.short_description = 'Current Water'
+
 admin.site.register(MonthlyRentalFee, MonthlyRentalFeeAdmin)
+
 
 @admin.register(WaterUsage)
 class WaterUsageAdmin(admin.ModelAdmin):

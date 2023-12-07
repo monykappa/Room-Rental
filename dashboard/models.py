@@ -187,13 +187,13 @@ class WaterRate(models.Model):
 
 class Utilities(models.Model):
     room = models.OneToOneField('room', on_delete=models.CASCADE, related_name='utilities')
-    water_quantity = models.PositiveIntegerField(default=0)
+    previous_water = models.PositiveIntegerField(default=0)
+    current_water = models.PositiveIntegerField(default=0)
     water_rate = models.ForeignKey(WaterRate, on_delete=models.SET_NULL, null=True)
     date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f'Utilities for {self.room}'
-
 
 class WaterUsage(models.Model):
     room = models.ForeignKey('room', on_delete=models.CASCADE, related_name='water_usage')
@@ -207,8 +207,8 @@ class WaterUsage(models.Model):
 class MonthlyRentalFee(models.Model):
     room = models.ForeignKey('room', on_delete=models.CASCADE, related_name='monthly_fees')
     date = models.DateField(default=timezone.now)
-    current_water = models.PositiveIntegerField(null=True, blank=True)
     water_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    current_water = models.PositiveIntegerField(null=True, blank=True)
     trash_fee = models.DecimalField(max_digits=10, decimal_places=2)
     park_fee = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -218,17 +218,32 @@ class MonthlyRentalFee(models.Model):
         return water_quantity_difference * self.room.utilities.water_rate.rate
 
     def save(self, *args, **kwargs):
-        # Retrieve the most recent water usage entry for the room prior to the current date
-        try:
-            previous_water_entry = WaterUsage.objects.filter(room=self.room, date__lt=self.date).latest('date')
-            previous_water_quantity = previous_water_entry.water_quantity
-        except WaterUsage.DoesNotExist:
-            previous_water_quantity = 0
+        # Retrieve or create the Utilities instance for the room
+        utilities, created = Utilities.objects.get_or_create(room=self.room)
 
-        # Calculate and set the water fee
-        self.water_fee = self.calculate_water_cost(previous_water_quantity)
+        # Set the previous water in Utilities to the current water from Utilities
+        utilities.previous_water = utilities.current_water
 
-        # Save the MonthlyRentalFee instance
+        # Set the current water in Utilities to the current_water from MonthlyRentalFee
+        utilities.current_water = self.current_water
+
+        # Calculate water fee based on the difference with the previous water in Utilities
+        self.water_fee = self.calculate_water_cost(utilities.previous_water)
+
+        # Save the updated Utilities instance
+        utilities.save()
+
+        # Insert into WaterUsage model
+        water_usage = WaterUsage.objects.create(
+            room=self.room,
+            house_owner=self.room.HouseOwner,  # Access HouseOwner directly from room
+            water_quantity=self.current_water,
+            date=self.date
+        )
+
+        # Save the WaterUsage instance
+        water_usage.save()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
