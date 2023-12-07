@@ -170,9 +170,19 @@ class MonthlyRentalFeeAdmin(admin.ModelAdmin):
         return obj.room.RoomNo
 
     def total_fee(self, obj):
-        return obj.calculate_water_cost() + obj.trash_fee + obj.park_fee + obj.room.RoomFee
+        return obj.water_fee + obj.trash_fee + obj.park_fee + obj.room.RoomFee
 
 admin.site.register(MonthlyRentalFee, MonthlyRentalFeeAdmin)
+
+@admin.register(WaterUsage)
+class WaterUsageAdmin(admin.ModelAdmin):
+    list_display = ('room_no', 'house_owner', 'water_quantity', 'date')
+
+    def room_no(self, obj):
+        return obj.room.RoomNo
+
+    def house_owner(self, obj):
+        return obj.house_owner.name
 
 # class MonthlyRentalFeeForm(forms.ModelForm):
 #     room_status = forms.CharField(label='Room Status', required=False, widget=forms.TextInput(attrs={'readonly': 'readonly'}))
