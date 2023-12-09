@@ -28,6 +28,12 @@ from django.views import View
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.forms.models import modelformset_factory
+from django.http import HttpResponseBadRequest
+from django.db import transaction 
+from datetime import datetime
+
 
 
 def signin_view(request):
@@ -396,18 +402,54 @@ def edit_parking(request, parking_id):
 
     return render(request, 'dashboard/other_fee.html', {'success_message': success_message})
 
+
+
 @login_required
 def monthly_fee(request):
-    monthly_fees = MonthlyRentalFee.objects.all().order_by('-id') 
-    return render(request, 'dashboard/monthly/monthly_rental_fee.html', {'monthly_fees': monthly_fees})
+    monthly_fees = MonthlyRentalFee.objects.all().order_by('-id')
 
+    # Process the month filter form
+    initial_month = datetime.now().month
+    initial_year = datetime.now().year
+    form = MonthFilterForm(initial={'selected_month': initial_month, 'selected_year': initial_year})
 
-from django.forms.models import modelformset_factory
+    if request.GET.get('selected_month') and request.GET.get('selected_year'):
+        form = MonthFilterForm(request.GET)
+
+        if form.is_valid():
+            selected_month = int(form.cleaned_data['selected_month']) if form.cleaned_data['selected_month'] else None
+            selected_year = int(form.cleaned_data['selected_year']) if form.cleaned_data['selected_year'] else None
+            if selected_month is not None and selected_year is not None:
+                monthly_fees = monthly_fees.filter(date__month=selected_month, date__year=selected_year)
+
+    # Set the number of items per page
+    items_per_page = 10  # You can adjust this value
+
+    paginator = Paginator(monthly_fees, items_per_page)
+    page = request.GET.get('page')
+
+    try:
+        monthly_fees = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver the first page.
+        monthly_fees = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver the last page of results.
+        monthly_fees = paginator.page(paginator.num_pages)
+
+    return render(request, 'dashboard/monthly/monthly_rental_fee.html', {'monthly_fees': monthly_fees, 'form': form})
+
 
 @login_required
 def add_monthly_fee(request):
-    monthly_fees = MonthlyRentalFee.objects.all().order_by('-id') 
-    rooms = room.objects.all()  # Make sure it's 'Room' and not 'room'
-    context = {'monthly_fees': monthly_fees, 'rooms': rooms}
+    if request.method == 'POST':
+        forms = [MonthlyRentalFeeForm(room, request.POST, prefix=f'form-{room.id}') for room in room.objects.all()]
+        if all(form.is_valid() for form in forms):
+            for form in forms:
+                form.save()
+            return redirect('dashboard:monthly_fee')
 
+    forms = [MonthlyRentalFeeForm(room, prefix=f'form-{room.id}') for room in room.objects.all()]
+    previous_waters = [form.get_current_water() for form in forms]
+    context = {'forms': zip(forms, previous_waters)}
     return render(request, 'dashboard/monthly/add_monthly_fee.html', context)

@@ -53,48 +53,47 @@ Add Monthly Fee
     }
 
     tbody td {
+        color: black;
         padding: 15px;
     }
 </style>
 
 
-<div class="add-monthly-ctn">
-    <h1>Monthly Rental Fee</h1>
+<form method="post" action="{% url 'dashboard:add_monthly_fee' %}">
+    {% csrf_token %}
+    <div class="add-monthly-ctn">
+        <h1>Monthly Rental Fee</h1>
+        <table style="border: 1px solid grey; width: auto;">
+            <thead>
+                <tr>
+                    <th>Room No</th>
+                    <th>House Owner</th>
+                    <th>Current water m³</th>
+                    <th>Previous Water</th>
+                    <th>Trash Fee</th>
+                    <th>Park Fee</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form, previous_water in forms %}
+                <tr>
+                    <td>{{ form.room.RoomNo }}</td>
+                    <td>{{ form.room.HouseOwner }}</td>
+                    <td>{{ form.current_water }}</td>
+                    <td>{{ previous_water }} m³</td>
+                    <td>{{ form.trash_fee }}</td>
+                    <td>{{ form.park_fee }}</td>
+                    <td>{{ form.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-success">Save Monthly Fees</button>
+    </div>
+</form>
 
-    <table style="border: 1px solid grey; width: auto;">
-        <thead>
-            <tr>
-                <th>Room No</th>
-                <th>House Owner</th>
-                <th>Date</th>
-                <th>Current water m³</th>
-                <th>Previous water m³</th>
-                <th>Room fee</th>
-                <th>Trash Fee</th>
-                <th>Park Fee</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for room in rooms %}
-            <tr>
-                <td>{{ room.RoomNo }}</td>
-                <td>{{ room.HouseOwner }}</td>
-                <td><input type="number" name="form-{{ forloop.counter0 }}-date"></td>
-                <td><input type="number" name="form-{{ forloop.counter0 }}-current_water"></td>
 
-                <!-- Fetch the corresponding MonthlyRentalFee for the current room -->
-                {% with utilities=room.utilities %}
-                <td>{{ utilities.current_water }} m³</td>
-                {% endwith %}
-                <td>${{ room.RoomFee|stringformat:"g" }}</td>
-                <td><input type="number" name="form-{{ forloop.counter0 }}-trash_fee"></td>
-                <td><input type="number" name="form-{{ forloop.counter0 }}-park_fee"></td>
-            </tr>
-            {% endfor %}
-        </tbody>
 
-    </table>
-    <button type="submit" class="btn btn-success">Save Monthly Fees</button>
-</div>
 
 {% endblock content %}

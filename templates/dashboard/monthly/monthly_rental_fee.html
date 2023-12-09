@@ -7,14 +7,25 @@ Monthly Rental Fee
 {% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'css/dashboard/monthly/monthly_rental_fee.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/monthly/monthly_rental_fee.css' %}">
 {% endblock css %}
 
 {% block content %}
 <div class="monthly-rental-ctn">
 
     <h1>Monthly rental fee</h1>
-    <a href="{% url 'dashboard:add_monthly_fee' %}" class="btn btn-success">Add monthly fee</a>
+    <div class="top-table-ctn">
+        <div class="btn-ctn">
+            <a href="{% url 'dashboard:add_monthly_fee' %}" class="btn btn-success btn-add">Add monthly fee</a>
+        </div>
+        <form method="get" action="{% url 'dashboard:monthly_fee' %}">
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary btn-filter">Filter</button>
+            <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
+        </form>
+
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -45,7 +56,7 @@ Monthly Rental Fee
                 <td>${{ monthly_fee.total|stringformat:"g" }}</td>
 
 
-                
+
             </tr>
             {% endfor %}
         </tbody>

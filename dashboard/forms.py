@@ -5,6 +5,7 @@ from .models import *
 from django.utils.html import format_html
 from django.forms import inlineformset_factory
 from django.forms import formset_factory
+from datetime import datetime
 
 
 
@@ -94,3 +95,68 @@ class check_out_form(forms.ModelForm):
             Field('room', css_class='form-control mb-2', data_url='/room-search/'),  # Add data_url for AJAX room search
             Field('date', css_class='form-control mb-2'),
         )
+
+
+
+class MonthlyRentalFeeForm(forms.ModelForm):
+    class Meta:
+        model = MonthlyRentalFee
+        fields = ['current_water', 'trash_fee', 'park_fee', 'date']
+
+    def __init__(self, room, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['date'].widget = forms.DateInput(attrs={'type': 'date'})
+        self.fields['date'].initial = timezone.now().date()  # Set initial value to the current date
+        self.room = room  # Store the room in the form
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.room = self.room
+
+        # Calculate water fee using the provided calculate_water_cost method
+        instance.water_fee = instance.calculate_water_cost()
+
+        if commit:
+            instance.save()
+
+            # Update or create Utilities
+            utilities, created = Utilities.objects.get_or_create(room=self.room)
+            utilities.previous_water = utilities.current_water
+            utilities.current_water = instance.current_water
+            utilities.save()
+
+        return instance
+
+    def get_current_water(self):
+        # Retrieve current water from Utilities
+        utilities = Utilities.objects.get(room=self.room)
+        return utilities.current_water
+    
+
+class MonthFilterForm(forms.Form):
+    MONTH_CHOICES = [
+        (1, 'January'),
+        (2, 'February'),
+        (3, 'March'),
+        (4, 'April'),
+        (5, 'May'),
+        (6, 'June'),
+        (7, 'July'),
+        (8, 'August'),
+        (9, 'September'),
+        (10, 'October'),
+        (11, 'November'),
+        (12, 'December'),
+    ]
+
+    YEAR_CHOICES = [(year, str(year)) for year in range(2022, datetime.now().year + 2)]
+
+    selected_month = forms.ChoiceField(choices=MONTH_CHOICES, label='Select Month', required=False)
+    selected_year = forms.ChoiceField(choices=YEAR_CHOICES, label='Select Year', required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Set initial values to the current month and year
+        self.fields['selected_month'].initial = datetime.now().month
+        self.fields['selected_year'].initial = datetime.now().year

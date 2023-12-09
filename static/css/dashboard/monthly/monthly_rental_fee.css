@@ -35,3 +35,37 @@ tbody tr{
 tbody td{
     padding: 15px;
 }
+
+.top-table-ctn {
+    display: flex;
+}
+
+.top-table-ctn form {
+    margin-left: 10px;
+    display: flex;
+}
+button.btn-filter{
+    margin-left: 10px;
+    height: 40px;
+}
+/* Default styles */
+a.btn-reset {
+    margin-left: 10px;
+    height: 40px;
+}
+
+/* Responsive styles for screens smaller than 600px */
+@media (max-width: 600px) {
+    a.btn-reset {
+        margin-left: 5px;
+        height: 60px;
+    }
+}
+
+/* Responsive styles for screens smaller than 400px */
+@media (max-width: 850px) {
+    a.btn-reset {
+        margin-left: 2px;
+        height: 55px;
+    }
+}
