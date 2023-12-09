@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+Monthly Rental Fee
+{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/dashboard/monthly/monthly_rental_fee.css' %}">
+{% endblock css %}
+
+{% block content %}
+<div class="monthly-rental-ctn">
+
+    <h1>Monthly rental fee</h1>
+    <a href="{% url 'dashboard:add_monthly_fee' %}" class="btn btn-success">Add monthly fee</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Room No</th>
+                <th>House Owner</th>
+                <th>Date</th>
+                <th>Current water m³</th>
+                <th>Previous water m³</th>
+                <th>Water Fee</th>
+                <th>Room fee</th>
+                <th>Trash Fee</th>
+                <th>Park Fee</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for monthly_fee in monthly_fees %}
+            <tr>
+                <td>{{ monthly_fee.room.RoomNo }}</td>
+                <td> {{ monthly_fee.room.HouseOwner }}</td>
+                <td>{{ monthly_fee.date }}</td>
+                <td>{{ monthly_fee.current_water }} m³</td>
+                <td>{{ monthly_fee.previous_water }} m³</td>
+                <td>${{ monthly_fee.water_fee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.room.RoomFee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.trash_fee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.park_fee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.total|stringformat:"g" }}</td>
+
+
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock content %}

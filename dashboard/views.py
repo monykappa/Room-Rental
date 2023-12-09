@@ -27,6 +27,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views import View
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import formset_factory
 
 
 def signin_view(request):
@@ -395,3 +396,18 @@ def edit_parking(request, parking_id):
 
     return render(request, 'dashboard/other_fee.html', {'success_message': success_message})
 
+@login_required
+def monthly_fee(request):
+    monthly_fees = MonthlyRentalFee.objects.all().order_by('-id') 
+    return render(request, 'dashboard/monthly/monthly_rental_fee.html', {'monthly_fees': monthly_fees})
+
+
+from django.forms.models import modelformset_factory
+
+@login_required
+def add_monthly_fee(request):
+    monthly_fees = MonthlyRentalFee.objects.all().order_by('-id') 
+    rooms = room.objects.all()  # Make sure it's 'Room' and not 'room'
+    context = {'monthly_fees': monthly_fees, 'rooms': rooms}
+
+    return render(request, 'dashboard/monthly/add_monthly_fee.html', context)

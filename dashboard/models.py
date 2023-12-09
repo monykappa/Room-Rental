@@ -8,6 +8,8 @@ from decimal import Decimal
 from django.utils import timezone
 import os
 from dal import autocomplete
+from datetime import datetime, date
+
 
 
 
@@ -147,8 +149,6 @@ class CheckIn(models.Model):
     client_address = models.CharField(max_length=500, choices=provinces.PROVINCE_CHOICES, null=True)
     client_contact = models.CharField(max_length=200, null=True)
     room = models.ForeignKey('room', on_delete=models.CASCADE, related_name='check_in_entries')
-    parking = models.ForeignKey(parking, on_delete=models.CASCADE, null=True)
-    trash = models.ForeignKey(Trash, on_delete=models.CASCADE, null=True)
     date = models.DateField(default=timezone.now)
 
     def save(self, *args, **kwargs):
@@ -176,6 +176,7 @@ class CheckIn(models.Model):
     
     def __str__(self):
         return f'{self.client_name} - Room: {self.room.RoomNo} - Fee: ${self.room.RoomFee}'
+
     
 
 
@@ -209,45 +210,68 @@ class MonthlyRentalFee(models.Model):
     date = models.DateField(default=timezone.now)
     water_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     current_water = models.PositiveIntegerField(null=True, blank=True)
+    previous_water = models.PositiveIntegerField(default=0)  # New field for tracking previous water usage
     trash_fee = models.DecimalField(max_digits=10, decimal_places=2)
     park_fee = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-    def calculate_water_cost(self, previous_water_quantity):
-        # Calculate water fee based on the difference between current and previous water quantity
-        water_quantity_difference = self.current_water - previous_water_quantity
-        return water_quantity_difference * self.room.utilities.water_rate.rate
+    def calculate_water_cost(self):
+        # Ensure self.room.utilities.water_rate.rate is not None
+        if self.room.utilities.water_rate and self.room.utilities.water_rate.rate is not None:
+            water_quantity_difference = self.current_water - self.previous_water
+            return water_quantity_difference * self.room.utilities.water_rate.rate
+        else:
+            # Handle the case when water_rate or its rate is None
+            return 0 
+    
+    def calculate_total(self):
+        # Ensure none of the values are None before performing the addition
+        room_fee = self.room.RoomFee if self.room.RoomFee is not None else 0
+        water_fee = self.water_fee if self.water_fee is not None else 0
+        trash_fee = self.trash_fee if self.trash_fee is not None else 0
+        self.trash_fee = trash_fee
+        park_fee = self.park_fee if self.park_fee is not None else 0
+        self.park_fee = park_fee
+
+        return room_fee + water_fee + trash_fee + park_fee
 
     def save(self, *args, **kwargs):
-        # Retrieve or create the Utilities instance for the room
+        if not self.id:
+            self.previous_water = self.current_water
+
         utilities, created = Utilities.objects.get_or_create(room=self.room)
-
-        # Set the previous water in Utilities to the current water from Utilities
         utilities.previous_water = utilities.current_water
-
-        # Set the current water in Utilities to the current_water from MonthlyRentalFee
         utilities.current_water = self.current_water
+        self.previous_water = utilities.previous_water
 
-        # Calculate water fee based on the difference with the previous water in Utilities
-        self.water_fee = self.calculate_water_cost(utilities.previous_water)
+        self.water_fee = self.calculate_water_cost()
+        self.total = self.calculate_total()
 
-        # Save the updated Utilities instance
         utilities.save()
 
-        # Insert into WaterUsage model
+        if isinstance(utilities.date, datetime):
+            utilities.date = utilities.date.date()
+        elif isinstance(utilities.date, date):
+            pass
+
+        if self.date > utilities.date:
+            utilities.date = self.date
+            utilities.save()
+
+
+
+        water_quantity = self.current_water if self.current_water is not None else 0
         water_usage = WaterUsage.objects.create(
             room=self.room,
-            house_owner=self.room.HouseOwner,  # Access HouseOwner directly from room
-            water_quantity=self.current_water,
+            house_owner=self.room.HouseOwner,
+            water_quantity=water_quantity,
             date=self.date
         )
 
-        # Save the WaterUsage instance
         water_usage.save()
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f'{self.room} - {self.date}'
 
 
 

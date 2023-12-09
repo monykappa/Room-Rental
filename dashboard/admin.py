@@ -152,7 +152,7 @@ class CheckOutAdmin(admin.ModelAdmin):
 
 
 class UtilitiesAdmin(admin.ModelAdmin):
-    list_display = ('room_no', 'house_owner', 'current_water','previous_water', 'date')
+    list_display = ('room_no', 'house_owner', 'current_water', 'previous_water', 'date')
 
     def room_no(self, obj):
         return obj.room.RoomNo
@@ -160,29 +160,57 @@ class UtilitiesAdmin(admin.ModelAdmin):
     def house_owner(self, obj):
         return obj.room.HouseOwner.name
 
+
 admin.site.register(Utilities, UtilitiesAdmin)
+
+
 admin.site.register(WaterRate)
 
 class MonthlyRentalFeeAdmin(admin.ModelAdmin):
-    list_display = ('room_no', 'date', 'get_current_water', 'water_fee', 'trash_fee', 'park_fee', 'total_fee')
+    list_display = (
+        'room_no', 'date', 'current_water', 'previous_water', 
+        'room_fee', 'water_fee', 'trash_fee', 
+        'park_fee', 'total_fee'
+    )
 
     def room_no(self, obj):
         return obj.room.RoomNo
 
-    def get_current_water(self, obj):
-        # Retrieve the latest WaterUsage entry
-        try:
-            latest_water_usage = WaterUsage.objects.filter(room=obj.room).latest('date')
-            return latest_water_usage.water_quantity
-        except WaterUsage.DoesNotExist:
-            return None
+    def current_water(self, obj):
+        return obj.current_water
+
+    def previous_water(self, obj):
+        return obj.previous_water
+
+    def room_fee(self, obj):
+        return self.format_money(obj.room.RoomFee)
+
+    def water_fee(self, obj):
+        return self.format_money(obj.water_fee)
+
+    def trash_fee(self, obj):
+        return self.format_money(obj.trash_fee)
+
+    def park_fee(self, obj):
+        return self.format_money(obj.park_fee)
 
     def total_fee(self, obj):
-        return obj.water_fee + obj.trash_fee + obj.park_fee + obj.room.RoomFee
+        return self.format_money(obj.total if obj.total else 0)
 
-    get_current_water.short_description = 'Current Water'
+
+
+
+    def format_money(self, value):
+        numerator, denominator = value.as_integer_ratio()
+        formatted_value = '${:,.0f}'.format(value) if denominator == 1 else '${:,.2f}'.format(value)
+        return formatted_value
 
 admin.site.register(MonthlyRentalFee, MonthlyRentalFeeAdmin)
+
+
+
+
+
 
 
 @admin.register(WaterUsage)

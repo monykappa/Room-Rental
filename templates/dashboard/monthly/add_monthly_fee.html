@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Add Monthly Fee
+{% endblock title %}
+
+{% block content %}
+<style>
+    .add-monthly-ctn {
+        width: 100%;
+        display: block;
+        margin: auto;
+        margin-top: 5vh;
+    }
+
+    table {
+        margin: auto;
+        font-size: 18px;
+        width: 100%;
+    }
+
+    input {
+        width: 100px;
+    }
+
+    thead {
+        background-color: rgb(47, 11, 104);
+        color: white;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: rgb(224, 213, 241);
+
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: rgb(209, 185, 245);
+    }
+
+    thead th {
+        padding: 15px;
+        border: 1px solid #fff;
+    }
+
+    thead tr {
+        border: 1px solid grey;
+    }
+
+    tbody tr {
+        border: 1px solid grey;
+        padding: 5px;
+    }
+
+    tbody td {
+        padding: 15px;
+    }
+</style>
+
+
+<div class="add-monthly-ctn">
+    <h1>Monthly Rental Fee</h1>
+
+    <table style="border: 1px solid grey; width: auto;">
+        <thead>
+            <tr>
+                <th>Room No</th>
+                <th>House Owner</th>
+                <th>Date</th>
+                <th>Current water m³</th>
+                <th>Previous water m³</th>
+                <th>Room fee</th>
+                <th>Trash Fee</th>
+                <th>Park Fee</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+            <tr>
+                <td>{{ room.RoomNo }}</td>
+                <td>{{ room.HouseOwner }}</td>
+                <td><input type="number" name="form-{{ forloop.counter0 }}-date"></td>
+                <td><input type="number" name="form-{{ forloop.counter0 }}-current_water"></td>
+
+                <!-- Fetch the corresponding MonthlyRentalFee for the current room -->
+                {% with utilities=room.utilities %}
+                <td>{{ utilities.current_water }} m³</td>
+                {% endwith %}
+                <td>${{ room.RoomFee|stringformat:"g" }}</td>
+                <td><input type="number" name="form-{{ forloop.counter0 }}-trash_fee"></td>
+                <td><input type="number" name="form-{{ forloop.counter0 }}-park_fee"></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+    <button type="submit" class="btn btn-success">Save Monthly Fees</button>
+</div>
+
+{% endblock content %}
