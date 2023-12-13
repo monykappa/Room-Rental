@@ -492,10 +492,11 @@ def export_to_pdf(request, selected_month, selected_year):
     # Replace 'your_project' with the actual name of your Django project
     # Replace 'fonts' with the folder name where you placed the Khmer font file
     # Replace 'Khmer OS.ttf' with the actual name of your Khmer font file
-    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_battambang.ttf')
+    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
+
 
     # Register the Khmer font
-    pdfmetrics.registerFont(TTFont('Khmer OS Battambang', font_path))
+    pdfmetrics.registerFont(TTFont('Khmer OS', font_path))
 
     # Retrieve the monthly fees based on the selected month and year
     monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
@@ -512,7 +513,7 @@ def export_to_pdf(request, selected_month, selected_year):
     # Add a title above the table
     title_text = f"Monthly rental for {selected_month}/{selected_year}"
     title_style = getSampleStyleSheet()["Title"]
-    title_style.fontName = 'Khmer OS Battambang'  # Set the font for the title
+    title_style.fontName = 'Khmer OS'  # Set the font for the title
     title = Paragraph(title_text, title_style)
     elements.append(title)
 
@@ -524,16 +525,16 @@ def export_to_pdf(request, selected_month, selected_year):
         # Set up the PDF document for the new page
         data = []
         table_headers = [
-            "Room No",
-            "House Owner",
-            "Date",
-            "Current Water",
-            "Previous Water",
-            "Water Fee",
-            "Room Fee",
-            "Trash Fee",
-            "Park Fee",
-            "Total"
+            "Room No/លេខ​បន្ទប់",
+            "House Owner/ម្ចាស់ផ្ទះ",
+            "Date/កាលបរិច្ឆេទ",
+            "Current Water/ទឹកប្រាក់បូល",
+            "Previous Water/ទឹកប្រាក់មុន",
+            "Water Fee/ថ្លឹងទឹក",
+            "Room Fee/ថ្លឹងបន្ទប់",
+            "Trash Fee/ថ្លឹងសំប៊ូរ",
+            "Park Fee/ថ្លឹងជើងឡាន",
+            "Total/សរុប"
         ]
         data.append(table_headers)
 
@@ -556,7 +557,7 @@ def export_to_pdf(request, selected_month, selected_year):
         style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                            ('FONTNAME', (0, 0), (-1, 0), 'cdKhmer OS Battambang'),  # Set the font for the table
+                            ('FONTNAME', (0, 0), (-1, 0), 'Khmer OS'),  # Set the font for the table
                             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
                             ('GRID', (0, 0), (-1, -1), 1, colors.black)])
