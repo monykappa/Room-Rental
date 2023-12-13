@@ -160,3 +160,8 @@ class MonthFilterForm(forms.Form):
         # Set initial values to the current month and year
         self.fields['selected_month'].initial = datetime.now().month
         self.fields['selected_year'].initial = datetime.now().year
+        
+        
+class MonthYearForm(forms.Form):
+    selected_month = forms.ChoiceField(choices=[(i, i) for i in range(1, 13)], label='Select Month')
+    selected_year = forms.IntegerField(label='Enter Year')

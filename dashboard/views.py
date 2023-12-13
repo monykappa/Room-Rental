@@ -22,6 +22,7 @@ from .models import CheckIn as CheckInModel
 from django.urls import reverse
 from django.db.models import Max
 from datetime import timedelta
+from django.conf import settings
 from django.http import HttpResponse
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views import View
@@ -33,6 +34,13 @@ from django.forms.models import modelformset_factory
 from django.http import HttpResponseBadRequest
 from django.db import transaction 
 from datetime import datetime
+from reportlab.lib.pagesizes import landscape
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, PageTemplate, BaseDocTemplate, PageBreak, Paragraph 
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
+import os
+
 
 
 
@@ -453,3 +461,117 @@ def add_monthly_fee(request):
     previous_waters = [form.get_current_water() for form in forms]
     context = {'forms': zip(forms, previous_waters)}
     return render(request, 'dashboard/monthly/add_monthly_fee.html', context)
+
+
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+@login_required
+def select_month_year(request):
+    if request.method == 'POST':
+        form = MonthYearForm(request.POST)
+        if form.is_valid():
+            selected_month = form.cleaned_data['selected_month']
+            selected_year = form.cleaned_data['selected_year']
+
+            # Redirect to the export_to_pdf view with the selected month and year
+            return export_to_pdf(request, selected_month, selected_year)
+    else:
+        # Set initial values to the current month and year
+        initial_month = datetime.now().month
+        initial_year = datetime.now().year
+        form = MonthYearForm(initial={'selected_month': initial_month, 'selected_year': initial_year})
+
+    return redirect('dashboard:export_to_pdf', selected_month=selected_month, selected_year=selected_year)
+
+
+from reportlab.lib import colors
+
+@login_required
+def export_to_pdf(request, selected_month, selected_year):
+    # Replace 'your_project' with the actual name of your Django project
+    # Replace 'fonts' with the folder name where you placed the Khmer font file
+    # Replace 'Khmer OS.ttf' with the actual name of your Khmer font file
+    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_battambang.ttf')
+
+    # Register the Khmer font
+    pdfmetrics.registerFont(TTFont('Khmer OS Battambang', font_path))
+
+    # Retrieve the monthly fees based on the selected month and year
+    monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
+
+    # Create a file-like buffer to receive PDF data
+    buffer = BytesIO()
+
+    # Create the PDF object using the buffer as its "file"
+    p = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+
+    # Set up the PDF document
+    elements = []
+
+    # Add a title above the table
+    title_text = f"Monthly rental for {selected_month}/{selected_year}"
+    title_style = getSampleStyleSheet()["Title"]
+    title_style.fontName = 'Khmer OS Battambang'  # Set the font for the title
+    title = Paragraph(title_text, title_style)
+    elements.append(title)
+
+    for i, monthly_fee in enumerate(monthly_fees):
+        # Add a new page for each room except the first one
+        if i > 0:
+            elements.append(PageBreak())
+
+        # Set up the PDF document for the new page
+        data = []
+        table_headers = [
+            "Room No",
+            "House Owner",
+            "Date",
+            "Current Water",
+            "Previous Water",
+            "Water Fee",
+            "Room Fee",
+            "Trash Fee",
+            "Park Fee",
+            "Total"
+        ]
+        data.append(table_headers)
+
+        data_row = [
+            str(monthly_fee.room.RoomNo),
+            str(monthly_fee.room.HouseOwner.name),
+            str(monthly_fee.date),
+            f"{monthly_fee.current_water} m³",
+            f"{monthly_fee.previous_water} m³",
+            f"${monthly_fee.water_fee:.2f}",
+            f"${monthly_fee.room.RoomFee:.2f}",
+            f"${monthly_fee.trash_fee:.2f}",
+            f"${monthly_fee.park_fee:.2f}",
+            f"${monthly_fee.total:.2f}"
+        ]
+        data.append(data_row)
+
+        # Create the table and set style
+        table = Table(data)
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'cdKhmer OS Battambang'),  # Set the font for the table
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+        table.setStyle(style)
+
+        # Add the table to the elements for this page
+        elements.append(table)
+
+    # Build the PDF
+    p.build(elements)
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
+    return response

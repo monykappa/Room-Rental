@@ -21,8 +21,10 @@ Monthly Rental Fee
         <form method="get" action="{% url 'dashboard:monthly_fee' %}">
             {{ form.as_p }}
             <button type="submit" class="btn btn-primary btn-filter">Filter</button>
+            <a href="{% url 'dashboard:monthly_fee_pdf' selected_month=form.selected_month.value selected_year=form.selected_year.value %}" class="btn btn-success btn-pdf">Export to PDF</a>
             <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
         </form>
+        
 
     </div>
 
@@ -54,13 +56,14 @@ Monthly Rental Fee
                 <td>${{ monthly_fee.trash_fee|stringformat:"g" }}</td>
                 <td>${{ monthly_fee.park_fee|stringformat:"g" }}</td>
                 <td>${{ monthly_fee.total|stringformat:"g" }}</td>
-
-
-
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
 </div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+
 {% endblock content %}
