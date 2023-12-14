@@ -52,7 +52,7 @@ urlpatterns = [
     #monthly
     path('monthly_fee/', views.monthly_fee, name='monthly_fee'),
     path('add_monthly_fee/', views.add_monthly_fee, name='add_monthly_fee'),\
-    path('export_to_pdf/<int:selected_month>/<int:selected_year>/', views.export_to_pdf, name='monthly_fee_pdf'),
+    # path('export_to_pdf/<int:selected_month>/<int:selected_year>/', views.export_to_pdf, name='monthly_fee_pdf'),
     # path('monthly-fee-input/', views.monthly_fee_input, name='monthly_fee_input'),
     # path('save-monthly-fee/', views.save_monthly_fee, name='save_monthly_fee'),
     # path('invoice/<int:invoice_id>/', views.invoice_detail, name='invoice_detail'),

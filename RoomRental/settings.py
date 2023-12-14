@@ -129,6 +129,8 @@ USE_TZ = True
 
 
 
+
+
 LOGIN_URL = 'dashboard:signin'
 LOGIN_REDIRECT_URL = 'dashboard:dashboard' 
 LOGOUT_REDIRECT_URL = 'dashboard:signin'

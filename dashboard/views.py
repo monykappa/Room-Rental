@@ -487,92 +487,90 @@ def select_month_year(request):
 
 from reportlab.lib import colors
 
-@login_required
-def export_to_pdf(request, selected_month, selected_year):
-    # Replace 'your_project' with the actual name of your Django project
-    # Replace 'fonts' with the folder name where you placed the Khmer font file
-    # Replace 'Khmer OS.ttf' with the actual name of your Khmer font file
-    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
+# @login_required
+# def export_to_pdf(request, selected_month, selected_year):
+#     font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
 
+#     # Register the Khmer font
+#     pdfmetrics.registerFont(TTFont('KhmerOS', font_path))
 
-    # Register the Khmer font
-    pdfmetrics.registerFont(TTFont('Khmer OS', font_path))
+#     # Retrieve the monthly fees based on the selected month and year
+#     monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
 
-    # Retrieve the monthly fees based on the selected month and year
-    monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
+#     # Create a file-like buffer to receive PDF data
+#     buffer = BytesIO()
 
-    # Create a file-like buffer to receive PDF data
-    buffer = BytesIO()
+#     # Create the PDF object using the buffer as its "file"
+#     p = SimpleDocTemplate(buffer, pagesize=landscape(letter))
 
-    # Create the PDF object using the buffer as its "file"
-    p = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+#     # Set up the PDF document
+#     elements = []
 
-    # Set up the PDF document
-    elements = []
+#     # Add a title above the table
+#     title_text = f"Monthly rental for {selected_month}/{selected_year}"
+#     title_style = getSampleStyleSheet()["Title"]
+#     title_style.fontName = 'KhmerOS'  # Set the font for the title
+#     title = Paragraph(title_text, title_style)
+#     elements.append(title)
 
-    # Add a title above the table
-    title_text = f"Monthly rental for {selected_month}/{selected_year}"
-    title_style = getSampleStyleSheet()["Title"]
-    title_style.fontName = 'Khmer OS'  # Set the font for the title
-    title = Paragraph(title_text, title_style)
-    elements.append(title)
+#     for i, monthly_fee in enumerate(monthly_fees):
+#         # Add a new page for each room except the first one
+#         if i > 0:
+#             elements.append(PageBreak())
 
-    for i, monthly_fee in enumerate(monthly_fees):
-        # Add a new page for each room except the first one
-        if i > 0:
-            elements.append(PageBreak())
+#         # Set up the PDF document for the new page
+#         data = []
+#         table_headers = [
+#             "Room No/លេខ​បន្ទប់",
+#             "House Owner/ម្ចាស់ផ្ទះ",
+#             "Date/កាលបរិច្ឆេទ",
+#             "Current Water/ទឹកប្រាក់បូល",
+#             "Previous Water/ទឹកប្រាក់មុន",
+#             "Water Fee/ថ្លឹងទឹក",
+#             "Room Fee/ថ្លឹងបន្ទប់",
+#             "Trash Fee/ថ្លឹងសំប៊ូរ",
+#             "Park Fee/ថ្លឹងជើងឡាន",
+#             "Total/សរុប"
+#         ]
+#         data.append(table_headers)
 
-        # Set up the PDF document for the new page
-        data = []
-        table_headers = [
-            "Room No/លេខ​បន្ទប់",
-            "House Owner/ម្ចាស់ផ្ទះ",
-            "Date/កាលបរិច្ឆេទ",
-            "Current Water/ទឹកប្រាក់បូល",
-            "Previous Water/ទឹកប្រាក់មុន",
-            "Water Fee/ថ្លឹងទឹក",
-            "Room Fee/ថ្លឹងបន្ទប់",
-            "Trash Fee/ថ្លឹងសំប៊ូរ",
-            "Park Fee/ថ្លឹងជើងឡាន",
-            "Total/សរុប"
-        ]
-        data.append(table_headers)
+#         data_row = [
+#             str(monthly_fee.room.RoomNo),
+#             str(monthly_fee.room.HouseOwner.name),
+#             str(monthly_fee.date),
+#             f"{monthly_fee.current_water} m³",
+#             f"{monthly_fee.previous_water} m³",
+#             f"${monthly_fee.water_fee:.2f}",
+#             f"${monthly_fee.room.RoomFee:.2f}",
+#             f"${monthly_fee.trash_fee:.2f}",
+#             f"${monthly_fee.park_fee:.2f}",
+#             f"${monthly_fee.total:.2f}"
+#         ]
+#         data.append(data_row)
 
-        data_row = [
-            str(monthly_fee.room.RoomNo),
-            str(monthly_fee.room.HouseOwner.name),
-            str(monthly_fee.date),
-            f"{monthly_fee.current_water} m³",
-            f"{monthly_fee.previous_water} m³",
-            f"${monthly_fee.water_fee:.2f}",
-            f"${monthly_fee.room.RoomFee:.2f}",
-            f"${monthly_fee.trash_fee:.2f}",
-            f"${monthly_fee.park_fee:.2f}",
-            f"${monthly_fee.total:.2f}"
-        ]
-        data.append(data_row)
+#         # Create the table and set style
+#         table = Table(data, colWidths=[100, 150, 80, 100, 100, 80, 80, 80, 80, 80])  # Adjust column widths as needed
+#         style = TableStyle([
+#             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+#             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+#             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#             ('FONTNAME', (0, 0), (-1, 0), 'KhmerOS'),  # Set the font for the table headers
+#             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+#             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+#             ('GRID', (0, 0), (-1, -1), 1, colors.black)
+#         ])
 
-        # Create the table and set style
-        table = Table(data)
-        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                            ('FONTNAME', (0, 0), (-1, 0), 'Khmer OS'),  # Set the font for the table
-                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                            ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+#         table.setStyle(style)
 
-        table.setStyle(style)
+#         # Add the table to the elements for this page
+#         elements.append(table)
 
-        # Add the table to the elements for this page
-        elements.append(table)
+#     # Build the PDF
+#     p.build(elements)
 
-    # Build the PDF
-    p.build(elements)
-
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
-    return response
+#     # FileResponse sets the Content-Disposition header so that browsers
+#     # present the option to save the file.
+#     buffer.seek(0)
+#     response = HttpResponse(buffer, content_type='application/pdf')
+#     response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
+#     return response
