@@ -23,14 +23,13 @@
             <form method="get" action="{% url 'dashboard:monthly_fee' %}">
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-primary btn-filter">Filter</button>
-                <!-- <a href="" class="btn btn-success btn-pdf">Export to PDF</a> -->
                 <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
             </form>
             
 
         </div>
 
-        <table>
+        <table id="data-table">
             <thead>
                 <tr>
                     <th>Room No</th>
@@ -64,8 +63,38 @@
         </table>
     </div>
 
+    <a href=" {%url 'dashboard:export_pdf' %} " class="btn btn-success">Export to PDF</a>
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.js"></script>
+
+
+    <!-- <script>
+        $(document).ready(function () {
+            $("#export-pdf").on("click", function () {
+                // Select the table content
+                var element = document.getElementById('data-table');
+    
+                // Set the options for html2pdf
+                var opt = {
+                    margin:       10,
+                    filename:     'monthly_rental_fee.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2 },
+                    jsPDF:         { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+    
+                // Use html2pdf to generate the PDF
+                html2pdf().from(element).set(opt).outputPdf(function(pdf) {
+                    var blob = new Blob([pdf], { type: 'application/pdf' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'monthly_rental_fee.pdf';
+                    link.click();
+                });
+            });
+        });
+    </script> -->
 
     {% endblock content %}

@@ -466,6 +466,40 @@ def add_monthly_fee(request):
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
+
+
+from reportlab.lib import colors
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+class MonthlyFeePDFView(View):
+    template_name = 'dashboard/monthly/monthly_rental_fee_pdf.html'
+
+    def get(self, request, *args, **kwargs):
+        selected_month = request.GET.get('month')
+        selected_year = request.GET.get('year')
+
+        if not selected_month:
+            selected_month = datetime.now().strftime('%m')
+        if not selected_year:
+            selected_year = datetime.now().strftime('%Y')
+
+        monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
+
+        template = get_template(self.template_name)
+        html = template.render({'monthly_fees': monthly_fees, 'selected_month': selected_month, 'selected_year': selected_year})
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'filename="monthly_rental_fee_{selected_month}_{selected_year}.pdf"'
+
+        pisa_status = pisa.CreatePDF(html, dest=response)
+
+        if pisa_status.err:
+            return HttpResponse('Error creating PDF', status=500)
+
+        return response
+
+
 @login_required
 def select_month_year(request):
     if request.method == 'POST':
@@ -474,19 +508,13 @@ def select_month_year(request):
             selected_month = form.cleaned_data['selected_month']
             selected_year = form.cleaned_data['selected_year']
 
-            # Redirect to the export_to_pdf view with the selected month and year
-            return export_to_pdf(request, selected_month, selected_year)
+            return redirect('dashboard:monthly_fee_pdf', month=selected_month, year=selected_year)
     else:
-        # Set initial values to the current month and year
         initial_month = datetime.now().month
         initial_year = datetime.now().year
         form = MonthYearForm(initial={'selected_month': initial_month, 'selected_year': initial_year})
 
-    return redirect('dashboard:export_to_pdf', selected_month=selected_month, selected_year=selected_year)
-
-
-from reportlab.lib import colors
-
+    return render(request, 'dashboard/monthly/monthly_rental_fee.html', {'form': form})
 # @login_required
 # def export_to_pdf(request, selected_month, selected_year):
 #     font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
