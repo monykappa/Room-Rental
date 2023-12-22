@@ -471,33 +471,132 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+import locale
 
-class MonthlyFeePDFView(View):
-    template_name = 'dashboard/monthly/monthly_rental_fee_pdf.html'
 
-    def get(self, request, *args, **kwargs):
-        selected_month = request.GET.get('month')
-        selected_year = request.GET.get('year')
 
-        if not selected_month:
-            selected_month = datetime.now().strftime('%m')
-        if not selected_year:
-            selected_year = datetime.now().strftime('%Y')
+@login_required
+def export_to_pdf(request, selected_month, selected_year):
+    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
+    locale.setlocale(locale.LC_ALL, '')
 
-        monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
+    # Register the Khmer font with the "Middle Eastern and South Asian" text engine
+    pdfmetrics.registerFont(TTFont('Khmer OS', font_path))
+    pdfmetrics.registerFont(TTFont('Khmer OS Muol', os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_muol.ttf')))
+    pdfmetrics.registerFont(TTFont('Khmer OS Bokor', os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_bokor.ttf')))
+    pdfmetrics.registerFont(TTFont('Khmer OS Siemreap', os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_siemreap.ttf')))
 
-        template = get_template(self.template_name)
-        html = template.render({'monthly_fees': monthly_fees, 'selected_month': selected_month, 'selected_year': selected_year})
+    # Retrieve the monthly fees based on the selected month and year
+    monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
 
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'filename="monthly_rental_fee_{selected_month}_{selected_year}.pdf"'
+    # Create a file-like buffer to receive PDF data
+    buffer = BytesIO()
 
-        pisa_status = pisa.CreatePDF(html, dest=response)
+    # Create the PDF object using the buffer as its "file"
+    p = SimpleDocTemplate(buffer, pagesize=landscape(letter))
 
-        if pisa_status.err:
-            return HttpResponse('Error creating PDF', status=500)
+    # Set up the PDF document
+    elements = []
 
-        return response
+    for i, monthly_fee in enumerate(monthly_fees):
+        # Add a new page for each room except the first one
+        if i > 0:
+            elements.append(PageBreak())
+
+        # Add the title for each new page
+        title_text = f"Monthly rental for / ការជួលប្រចាំខែ{selected_month}/{selected_year}"
+        title_style = getSampleStyleSheet()["Title"]
+        title_style.fontName = 'Khmer OS'  # Set the font for the title
+        title = Paragraph(title_text, title_style)
+        elements.append(title)
+
+        # Set up the PDF document for the new page
+        data = []
+        table_headers = [
+            "ល.រ",
+            "ម្ចាស់ផ្ទះ",
+            "កាលបរិច្ឆេទ",
+            "ទឹកប្រាក់បន្ថែម",
+            "ទឹកប្រាក់ថ្មី",
+            "តម្លៃទឹក",
+            "តម្លៃបន្ទប់",
+            "តម្លៃពោធិ",
+            "តម្លៃចល័ត",
+            "សរុប($)",
+            "សរុប(៛)",
+        ]
+        data.append(table_headers)
+
+        # Format the total in Khmer Riel using locale
+        formatted_riel_total = locale.format_string('%.0f', monthly_fee.total * 4100, grouping=True)
+
+        data_row = [
+            str(monthly_fee.room.RoomNo),
+            str(monthly_fee.room.HouseOwner.name),
+            str(monthly_fee.date),
+            f"{monthly_fee.previous_water} m³",
+            f"{monthly_fee.current_water} m³",
+            f"${monthly_fee.water_fee:.2f}",
+            f"${monthly_fee.room.RoomFee:.2f}",
+            f"${monthly_fee.trash_fee:.2f}",
+            f"${monthly_fee.park_fee:.2f}",
+            f"${monthly_fee.total:.2f}",
+            formatted_riel_total,
+        ]
+        data.append(data_row)
+
+        # Create the table and set style
+        table = Table(data)
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Khmer OS'),  # Set the font for the table
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+        table.setStyle(style)
+
+        # Add the table to the elements for this page
+        elements.append(table)
+
+    # Build the PDF
+    p.build(elements)
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
+    return response
+
+# class MonthlyFeeExportView(View):
+#     template_name = 'dashboard/monthly/monthly_fee_export_pdf.html'
+
+#     def get(self, request, *args, **kwargs):
+#         selected_month = request.GET.get('month')
+
+#         # Ensure selected_month is not empty
+#         if not selected_month:
+#             return HttpResponse('Please provide a valid month', status=400)
+
+#         # Fetch monthly fees based on the selected month
+#         monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month)
+
+#         template = get_template(self.template_name)
+#         context = {'monthly_fees': monthly_fees, 'selected_month': selected_month}
+#         html = template.render(context)
+
+#         # Create a PDF response
+#         response = HttpResponse(content_type='application/pdf')
+#         response['Content-Disposition'] = f'filename="monthly_rental_fee_{selected_month}.pdf"'
+
+#         # Generate PDF and write to the response
+#         pdf = pisa.CreatePDF(html, dest=response)
+#         if pdf.err:
+#             return HttpResponse('Error creating PDF', status=500)
+
+#         return response
 
 
 @login_required
@@ -602,3 +701,60 @@ def select_month_year(request):
 #     response = HttpResponse(buffer, content_type='application/pdf')
 #     response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
 #     return response
+
+
+def room_pie_chart(request):
+    available_count = room.objects.filter(status=room.AVAILABLE).count()
+    in_use_count = room.objects.filter(status=room.IN_USE).count()
+
+    data = {
+        'labels': ['Available', 'In Use'],
+        'data': [available_count, in_use_count],
+    }
+
+    return JsonResponse(data)
+
+
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth
+
+def checkin_checkout_bar_chart(request):
+    current_year = datetime.now().year
+
+    checkin_data = CheckIn.objects.filter(date__year=current_year).annotate(month=ExtractMonth('date')).values('month').annotate(count=Count('id'))
+    checkout_data = CheckOut.objects.filter(date__year=current_year).annotate(month=ExtractMonth('date')).values('month').annotate(count=Count('id'))
+
+    months = [
+        datetime.strptime(f'{current_year}-{month}-1', '%Y-%m-%d').strftime('%B %Y')
+        for month in range(1, 13)
+    ]
+
+    data = {
+        'labels': months,
+        'checkin': list(checkin_data),
+        'checkout': list(checkout_data),
+    }
+
+    return JsonResponse(data, safe=False)
+
+def room_checkin_chart(request):
+    current_year = datetime.now().year
+
+    # Get all rooms
+    rooms = room.objects.all()
+
+    # Count check-ins for each room
+    checkin_data = []
+    for room_instance in rooms:
+        checkin_count = CheckIn.objects.filter(room=room_instance, date__year=current_year).count()
+        checkin_data.append({
+            'room_no': room_instance.RoomNo,
+            'checkin_count': checkin_count,
+        })
+
+    data = {
+        'labels': [entry['room_no'] for entry in checkin_data],
+        'checkin_count': [entry['checkin_count'] for entry in checkin_data],
+    }
+
+    return JsonResponse(data, safe=False)

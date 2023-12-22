@@ -1,11 +1,169 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block css %} <link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}"> {% endblock %}
-{% block title %}Dashboard{% endblock title %}
-<body>
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}">
+{% endblock %}
 
+{% block title %}
+Dashboard
+{% endblock title %}
+
+<body>
     {% block content %}
-    
-    {% endblock content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+
+    <h1>Dashboard</h1>
+    <div class="dashboard-ctn">
+        <div class="room-ctn">
+            <h2>Room Rental Status</h2>
+            <div>
+                <canvas id="roomPieChart" width="200" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="check-in-check-out-ctn">
+            <h2>Check in/out current month</h2>
+            <div>
+                <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="check-in-check-out-ctn">
+            <h2>Room Check-in Chart</h2>
+        <div>
+            <canvas id="roomCheckinChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/room_checkin_chart/')
+                .then(response => response.json())
+                .then(data => {
+                    var ctx = document.getElementById('roomCheckinChart').getContext('2d');
+                    var myBarChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Check-ins',
+                                data: data.checkin_count,
+                                backgroundColor: 'blue',
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        fontSize: 14,
+                                    },
+                                },
+                                y: {
+                                    ticks: {
+                                        fontSize: 14,
+                                    },
+                                    beginAtZero: true,
+                                },
+                            },
+                        },
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/room_pie_chart/')
+                .then(response => response.json())
+                .then(data => {
+                    var ctx = document.getElementById('roomPieChart').getContext('2d');
+                    var myPieChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                data: data.data,
+                                backgroundColor: ['green', 'orange'],
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                datalabels: {
+                                    color: 'white', // Set label color
+                                    backgroundColor: function (context) {
+                                        return context.dataset.backgroundColor; // Match label background color with dataset color
+                                    },
+                                    borderColor: 'transparent',
+                                    borderRadius: 25,
+                                    font: {
+                                        weight: 'bold',
+                                        size: '12',
+                                    },
+                                    formatter: (value, context) => {
+                                        return context.chart.data.labels[context.dataIndex] + '\n' + value;
+                                    },
+                                    display: 'auto', // 'auto' will display labels by default
+                                },
+                            },
+                        },
+                    });
+                });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/checkin_checkout_bar_chart/')
+                .then(response => response.json())
+                .then(data => {
+                    var ctx = document.getElementById('checkinCheckoutBarChart').getContext('2d');
+                    var myBarChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Check-in',
+                                data: data.checkin.map(entry => entry.count),
+                                backgroundColor: 'green',
+                            },
+                            {
+                                label: 'Check-out',
+                                data: data.checkout.map(entry => entry.count),
+                                backgroundColor: 'orange',
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        fontSize: 14, 
+                                    },
+                                },
+                                y: {
+                                    ticks: {
+                                        fontSize: 14,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                });
+        });
+
+
+    </script>
+
+
+    {% endblock %}
 </body>

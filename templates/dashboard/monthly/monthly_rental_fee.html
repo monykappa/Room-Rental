@@ -22,6 +22,7 @@
             </div>
             <form method="get" action="{% url 'dashboard:monthly_fee' %}">
                 {{ form.as_p }}
+                <a href="{% url 'dashboard:monthly_fee_pdf' selected_month=form.selected_month.value selected_year=form.selected_year.value %}" class="btn btn-success btn-pdf">Export to PDF</a>
                 <button type="submit" class="btn btn-primary btn-filter">Filter</button>
                 <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
             </form>
@@ -63,7 +64,6 @@
         </table>
     </div>
 
-    <a href=" {%url 'dashboard:export_pdf' %} " class="btn btn-success">Export to PDF</a>
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>

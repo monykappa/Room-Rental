@@ -1,3 +1,9 @@
 h1{
-    color:Red;
+    color:black;
+}
+.dashboard-ctn{
+    padding: 15px;
+    border:1px solid red;
+    display: flex;
+    justify-content: space-between;
 }

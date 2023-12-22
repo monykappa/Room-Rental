@@ -116,12 +116,20 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+from django.utils import timezone
+import pytz
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Get the current time in UTC
+utc_now = timezone.now()
+
+# Set the desired time zone (Asia/Phnom_Penh for UTC+7)
+cambodia_timezone = pytz.timezone('Asia/Phnom_Penh')
+localized_time = utc_now.astimezone(cambodia_timezone)
 
 USE_I18N = True
 
