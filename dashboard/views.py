@@ -477,11 +477,11 @@ import locale
 
 @login_required
 def export_to_pdf(request, selected_month, selected_year):
-    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
+    font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_siemreap.ttf')
     locale.setlocale(locale.LC_ALL, '')
 
     # Register the Khmer font with the "Middle Eastern and South Asian" text engine
-    pdfmetrics.registerFont(TTFont('Khmer OS', font_path))
+    pdfmetrics.registerFont(TTFont('Khmer OS Siemreap', font_path))
     pdfmetrics.registerFont(TTFont('Khmer OS Muol', os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_muol.ttf')))
     pdfmetrics.registerFont(TTFont('Khmer OS Bokor', os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_bokor.ttf')))
     pdfmetrics.registerFont(TTFont('Khmer OS Siemreap', os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS_siemreap.ttf')))
@@ -505,9 +505,7 @@ def export_to_pdf(request, selected_month, selected_year):
 
         # Add the title for each new page
         title_text = f"Monthly rental for / ការជួលប្រចាំខែ{selected_month}/{selected_year}"
-        title_style = getSampleStyleSheet()["Title"]
-        title_style.fontName = 'Khmer OS'  # Set the font for the title
-        title = Paragraph(title_text, title_style)
+        title = Paragraph(title_text, getSampleStyleSheet()['Title'])
         elements.append(title)
 
         # Set up the PDF document for the new page
@@ -550,7 +548,7 @@ def export_to_pdf(request, selected_month, selected_year):
         style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                            ('FONTNAME', (0, 0), (-1, 0), 'Khmer OS'),  # Set the font for the table
+                            ('FONTNAME', (0, 0), (-1, 0), 'Khmer OS Siemreap'),  # Set the font for the table
                             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
                             ('GRID', (0, 0), (-1, -1), 1, colors.black)])
@@ -570,6 +568,176 @@ def export_to_pdf(request, selected_month, selected_year):
     response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
     return response
 
+
+import openpyxl
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from django.http import HttpResponse
+from docx import Document
+from docx.shared import Pt
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.table import WD_ALIGN_VERTICAL
+
+from docx.oxml import OxmlElement
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+
+
+@login_required
+def export_to_excel(request, selected_month, selected_year):
+    # Retrieve the monthly fees based on the selected month and year
+    monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
+
+    # Create a new Excel workbook and add a worksheet
+    workbook = Workbook()
+    worksheet = workbook.active
+
+    # Add headers to the worksheet
+    headers = ["ល.រ", "ម្ចាស់ផ្ទះ", "កាលបរិច្ឆេទ", "ទឹកប្រាក់បន្ថែម", "ទឹកប្រាក់ថ្មី", "តម្លៃទឹក", "តម្លៃបន្ទប់", "តម្លៃពោធិ", "តម្លៃចល័ត", "សរុប($)", "សរុប(៛)"]
+    worksheet.append(headers)
+
+    # Add data to the worksheet
+    for monthly_fee in monthly_fees:
+        row_data = [
+            monthly_fee.room.RoomNo,
+            monthly_fee.room.HouseOwner.name,
+            str(monthly_fee.date),
+            monthly_fee.previous_water,
+            monthly_fee.current_water,
+            monthly_fee.water_fee,
+            monthly_fee.room.RoomFee,
+            monthly_fee.trash_fee,
+            monthly_fee.park_fee,
+            monthly_fee.total,
+            monthly_fee.total * 4100,  # Assuming this is the conversion to Khmer Riel
+        ]
+        worksheet.append(row_data)
+
+    # Create a response with the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=monthly_rental_fee_report_{selected_month}_{selected_year}.xlsx'
+    workbook.save(response)
+
+    return response
+
+
+
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.enum.section import WD_ORIENT
+from docx.shared import Pt, RGBColor
+import calendar
+
+def set_landscape_section(section):
+    section_start = section.start_type
+    section.orientation = WD_ORIENT.LANDSCAPE
+    section.start_type = section_start
+
+
+def add_border(cell):
+    if cell.paragraphs and cell.paragraphs[0].runs:
+        # Customize border
+        border = cell.paragraphs[0].runs[0].font
+        border.size = Pt(1)  # Border width
+        # Add padding
+        cell.paragraphs[0].paragraph_format.left_indent = Pt(4)
+        cell.paragraphs[0].paragraph_format.right_indent = Pt(4)
+
+    
+def export_to_word(request, selected_month, selected_year):
+    # Create a new Word document
+    document = Document()
+    # Retrieve monthly rental fees based on the selected month and year
+    monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
+
+    # Loop through each monthly fee entry
+    for i, monthly_fee in enumerate(monthly_fees):
+        # Add a new section (page) for each room except the first one
+        if i > 0:
+            section = document.add_section()
+            set_landscape_section(section)
+
+        # Add the title for each new page
+        room_number = monthly_fee.room.RoomNo
+
+# Define a mapping of English month names to Khmer month names
+        khmer_month_names = {
+            'January': 'មករា',
+            'February': 'កុម្ភៈ',
+            'March': 'មីនា',
+            'April': 'មេសា',
+            'May': 'ឧសភា',
+            'June': 'មិថុនា',
+            'July': 'កក្កដា',
+            'August': 'សីហា',
+            'September': 'កញ្ញា',
+            'October': 'តុលា',
+            'November': 'វិច្ឆិកា',
+            'December': 'ធ្នូ'
+        }
+
+        english_month_name = calendar.month_name[selected_month]
+        khmer_month_name = khmer_month_names.get(english_month_name, 'Unknown')
+
+        formatted_date = f"{khmer_month_name}/{selected_year}"
+
+        title_text = f"Monthly rental for Room {room_number},\n{formatted_date}"
+        title = document.add_paragraph()
+        title.add_run(title_text).bold = True
+        title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        title.runs[0].font.size = Pt(16)  # Increase font size for the title
+
+        # Create a table for each room with 2 columns and 10 rows
+        table = document.add_table(rows=10, cols=2)
+        table.alignment = WD_ALIGN_VERTICAL.CENTER  # Center-align content vertically
+
+        # Set table style to include borders
+        table.style = 'Table Grid'
+
+        # Customize borders for each cell in the table
+        for row in table.rows:
+            for cell in row.cells:
+                add_border(cell)
+
+        # Add content to the table
+        content_labels = ["លេខ​បន្ទប់", "ម្ចាស់ផ្ទះ", "កាលបរិច្ឆេទ", "ទឹកខែមុន", "ទឹកបច្ចុប្បន្ន",
+                          "ថ្លៃទឹក", "ថ្លៃ​ចតរថយន្ត", "ថ្លៃសំរាម", "ថ្លៃបន្ទប់", "ថ្លៃសរុប ($)"]
+
+        # Calculate total in Riel using an exchange rate (1 USD = 4000 Riel)
+        exchange_rate = 4100
+        total_riel = monthly_fee.total * exchange_rate
+        
+        formatted_total_riel = "{:,.0f}".format(total_riel) if total_riel % 1 == 0 else "{:,.2f}".format(total_riel)
+
+        content_values = [str(monthly_fee.room.RoomNo),
+                          str(monthly_fee.room.HouseOwner.name),
+                          str(monthly_fee.date),
+                          f"{monthly_fee.previous_water} m³",
+                          f"{monthly_fee.current_water} m³",
+                          f"${monthly_fee.water_fee:.2f}",
+                          f"${monthly_fee.park_fee:.2f}",
+                          f"${monthly_fee.trash_fee:.2f}",
+                          f"${monthly_fee.room.RoomFee:.2f}",
+                          f"${monthly_fee.total:.2f} រឺ {formatted_total_riel}៛"
+                          ]
+
+        # Iterate through labels and values to fill the table
+        for row_index, (label, value) in enumerate(zip(content_labels, content_values)):
+            table.cell(row_index, 0).text = label
+            table.cell(row_index, 1).text = value
+            # Increase font size for content
+            table.cell(row_index, 0).paragraphs[0].runs[0].font.size = Pt(12)
+            table.cell(row_index, 1).paragraphs[0].runs[0].font.size = Pt(12)
+            # Set Khmer OS font for content
+            table.cell(row_index, 0).paragraphs[0].runs[0].font.name = 'Khmer OS'
+            table.cell(row_index, 1).paragraphs[0].runs[0].font.name = 'Khmer OS'
+            
+
+    # Prepare the HTTP response with the Word document
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = f'attachment; filename=monthly_rental_fee_report_{selected_month}_{selected_year}.docx'
+    document.save(response)
+
+    return response
 # class MonthlyFeeExportView(View):
 #     template_name = 'dashboard/monthly/monthly_fee_export_pdf.html'
 

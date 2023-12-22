@@ -1,76 +1,80 @@
-    {% extends 'base.html' %}
-    {% load static %}
+{% extends 'base.html' %}
+{% load static %}
 
 
-    {% block title %}
-    Monthly Rental Fee
-    {% endblock title %}
+{% block title %}
+Monthly Rental Fee
+{% endblock title %}
 
-    {% block css %}
-    <link rel="stylesheet" href="{% static 'css/dashboard/monthly/monthly_rental_fee.css' %}">
-    {% endblock css %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/monthly/monthly_rental_fee.css' %}">
+{% endblock css %}
 
-    {% block content %}
+{% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
-    <div class="monthly-rental-ctn">
+<div class="monthly-rental-ctn">
 
-        <h1>Monthly rental fee</h1>
-        <div class="top-table-ctn">
-            <div class="btn-ctn">
-                <a href="{% url 'dashboard:add_monthly_fee' %}" class="btn btn-success btn-add">Add monthly fee</a>
-            </div>
-            <form method="get" action="{% url 'dashboard:monthly_fee' %}">
-                {{ form.as_p }}
-                <a href="{% url 'dashboard:monthly_fee_pdf' selected_month=form.selected_month.value selected_year=form.selected_year.value %}" class="btn btn-success btn-pdf">Export to PDF</a>
-                <button type="submit" class="btn btn-primary btn-filter">Filter</button>
-                <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
-            </form>
-            
-
+    <h1>Monthly rental fee</h1>
+    <div class="top-table-ctn">
+        <div class="btn-ctn">
+            <a href="{% url 'dashboard:add_monthly_fee' %}" class="btn btn-success btn-add">Add monthly fee</a>
         </div>
+        <form method="get" action="{% url 'dashboard:monthly_fee' %}">
+            {{ form.as_p }}
+            <a href="{% url 'dashboard:monthly_fee_pdf' selected_month=form.selected_month.value selected_year=form.selected_year.value %}"
+                class="btn btn-success btn-pdf">Export to PDF</a>
+            <button type="submit" class="btn btn-primary btn-filter">Filter</button>
+            <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
+        </form>
 
-        <table id="data-table">
-            <thead>
-                <tr>
-                    <th>Room No</th>
-                    <th>House Owner</th>
-                    <th>Date</th>
-                    <th>Current water m³</th>
-                    <th>Previous water m³</th>
-                    <th>Water Fee</th>
-                    <th>Room fee</th>
-                    <th>Trash Fee</th>
-                    <th>Park Fee</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for monthly_fee in monthly_fees %}
-                <tr>
-                    <td>{{ monthly_fee.room.RoomNo }}</td>
-                    <td> {{ monthly_fee.room.HouseOwner }}</td>
-                    <td>{{ monthly_fee.date }}</td>
-                    <td>{{ monthly_fee.current_water }} m³</td>
-                    <td>{{ monthly_fee.previous_water }} m³</td>
-                    <td>${{ monthly_fee.water_fee|stringformat:"g" }}</td>
-                    <td>${{ monthly_fee.room.RoomFee|stringformat:"g" }}</td>
-                    <td>${{ monthly_fee.trash_fee|stringformat:"g" }}</td>
-                    <td>${{ monthly_fee.park_fee|stringformat:"g" }}</td>
-                    <td>${{ monthly_fee.total|stringformat:"g" }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
     </div>
 
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Room No</th>
+                <th>House Owner</th>
+                <th>Date</th>
+                <th>Current water m³</th>
+                <th>Previous water m³</th>
+                <th>Water Fee</th>
+                <th>Room fee</th>
+                <th>Trash Fee</th>
+                <th>Park Fee</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for monthly_fee in monthly_fees %}
+            <tr>
+                <td>{{ monthly_fee.room.RoomNo }}</td>
+                <td> {{ monthly_fee.room.HouseOwner }}</td>
+                <td>{{ monthly_fee.date }}</td>
+                <td>{{ monthly_fee.current_water }} m³</td>
+                <td>{{ monthly_fee.previous_water }} m³</td>
+                <td>${{ monthly_fee.water_fee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.room.RoomFee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.trash_fee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.park_fee|stringformat:"g" }}</td>
+                <td>${{ monthly_fee.total|stringformat:"g" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<a href="{% url 'dashboard:export_to_excel' selected_month=form.selected_month.value selected_year=form.selected_year.value %}" class="btn btn-primary">Export to Excel</a>
+<a href="{% url 'dashboard:export_to_word' selected_month=form.selected_month.value selected_year=form.selected_year.value %}" class="btn btn-success btn-word">Export to Word</a>
 
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.js"></script>
 
 
-    <!-- <script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.js"></script>
+
+
+<!-- <script>
         $(document).ready(function () {
             $("#export-pdf").on("click", function () {
                 // Select the table content
@@ -97,4 +101,4 @@
         });
     </script> -->
 
-    {% endblock content %}
+{% endblock content %}
