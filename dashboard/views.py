@@ -680,11 +680,16 @@ def export_to_word(request, selected_month, selected_year):
 
         formatted_date = f"{khmer_month_name}/{selected_year}"
 
-        title_text = f"Monthly rental for Room {room_number},\n{formatted_date}"
+        title_text = f"ការជួលប្រចាំខែសម្រាប់បន្ទប់លេខ​ {room_number},\n​ ខែ{formatted_date}"
         title = document.add_paragraph()
-        title.add_run(title_text).bold = True
+        title_run = title.add_run(title_text)
+        title_run.bold = True
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        title.runs[0].font.size = Pt(16)  # Increase font size for the title
+        title_run.font.size = Pt(16)  # Increase font size for the title
+
+        # Set Khmer OS font for the title text
+        title_run.font.name = 'Khmer OS'
+
 
         # Create a table for each room with 2 columns and 10 rows
         table = document.add_table(rows=10, cols=2)

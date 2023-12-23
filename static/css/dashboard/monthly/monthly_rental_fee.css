@@ -49,13 +49,16 @@ button.btn-filter{
     height: 40px;
 }
 /* Default styles */
-a.btn-reset {
+a.btn-reset, .btn-excel, .btn-word, .btn-pdf{
     margin-left: 10px;
     height: 40px;
 }
 
 /* Responsive styles for screens smaller than 600px */
 @media (max-width: 600px) {
+    a.btn-excel, .btn-word, .btn-pdf{
+        height: 90px;
+    }
     a.btn-reset {
         margin-left: 5px;
         height: 60px;
