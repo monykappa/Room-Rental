@@ -451,7 +451,7 @@ def monthly_fee(request):
 @login_required
 def add_monthly_fee(request):
     if request.method == 'POST':
-        forms = [MonthlyRentalFeeForm(room, request.POST, prefix=f'form-{room.id}') for room in room.objects.all()]
+        forms = [MonthlyRentalFeeForm(room, request.POST, prefix=f'form-{room.id}') for room in Room.objects.all()]
         if all(form.is_valid() for form in forms):
             for form in forms:
                 form.save()
@@ -461,6 +461,9 @@ def add_monthly_fee(request):
     previous_waters = [form.get_current_water() for form in forms]
     context = {'forms': zip(forms, previous_waters)}
     return render(request, 'dashboard/monthly/add_monthly_fee.html', context)
+
+
+
 
 
 from reportlab.pdfgen import canvas
@@ -577,6 +580,7 @@ from docx import Document
 from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 
 from docx.oxml import OxmlElement
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
@@ -593,7 +597,7 @@ def export_to_excel(request, selected_month, selected_year):
     worksheet = workbook.active
 
     # Add headers to the worksheet
-    headers = ["ល.រ", "ម្ចាស់ផ្ទះ", "កាលបរិច្ឆេទ", "ទឹកប្រាក់បន្ថែម", "ទឹកប្រាក់ថ្មី", "តម្លៃទឹក", "តម្លៃបន្ទប់", "តម្លៃពោធិ", "តម្លៃចល័ត", "សរុប($)", "សរុប(៛)"]
+    headers = ["លេខ​បន្ទប់", "ម្ចាស់ផ្ទះ", "កាលបរិច្ឆេទ", "ទឹកខែមុន", "ទឹកបច្ចុប្បន្ន", "តម្លៃទឹក", "តម្លៃបន្ទប់", "ថ្លៃសំរាម", "ថ្លៃចតរថយន្ត", "សរុប($)", "សរុប(៛)"]
     worksheet.append(headers)
 
     # Add data to the worksheet
@@ -678,14 +682,14 @@ def export_to_word(request, selected_month, selected_year):
         english_month_name = calendar.month_name[selected_month]
         khmer_month_name = khmer_month_names.get(english_month_name, 'Unknown')
 
-        formatted_date = f"{khmer_month_name}/{selected_year}"
+        formatted_date = f"{khmer_month_name}-{selected_year}"
 
-        title_text = f"ការជួលប្រចាំខែសម្រាប់បន្ទប់លេខ​ {room_number},\n​ ខែ{formatted_date}"
+        title_text = f"ថ្លៃជួលប្រចាំខែ \nបន្ទប់លេខ {room_number}\n{monthly_fee.room.HouseOwner.name}\n{formatted_date}"
         title = document.add_paragraph()
         title_run = title.add_run(title_text)
         title_run.bold = True
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        title_run.font.size = Pt(16)  # Increase font size for the title
+        title_run.font.size = Pt(18)  # Increase font size for the title
 
         # Set Khmer OS font for the title text
         title_run.font.name = 'Khmer OS'
@@ -702,39 +706,45 @@ def export_to_word(request, selected_month, selected_year):
         for row in table.rows:
             for cell in row.cells:
                 add_border(cell)
-
+                
+            utilities = Utilities.objects.first()  
+            water_rate = utilities.water_rate if utilities else 0
         # Add content to the table
-        content_labels = ["លេខ​បន្ទប់", "ម្ចាស់ផ្ទះ", "កាលបរិច្ឆេទ", "ទឹកខែមុន", "ទឹកបច្ចុប្បន្ន",
-                          "ថ្លៃទឹក", "ថ្លៃ​ចតរថយន្ត", "ថ្លៃសំរាម", "ថ្លៃបន្ទប់", "ថ្លៃសរុប ($)"]
+            content_labels = ["លេខ​បន្ទប់", "កាលបរិច្ឆេទ", "ទឹកខែមុន", "ទឹកបច្ចុប្បន្ន",
+                            "អត្រាទឹក", "ថ្លៃទឹក", "ថ្លៃ​ចតរថយន្ត", "ថ្លៃសំរាម", "ថ្លៃបន្ទប់", "ថ្លៃសរុប"]
 
-        # Calculate total in Riel using an exchange rate (1 USD = 4000 Riel)
-        exchange_rate = 4100
-        total_riel = monthly_fee.total * exchange_rate
-        
-        formatted_total_riel = "{:,.0f}".format(total_riel) if total_riel % 1 == 0 else "{:,.2f}".format(total_riel)
+            # Calculate total in Riel using an exchange rate (1 USD = 4000 Riel)
+            exchange_rate = 4100
+            total_riel = monthly_fee.total * exchange_rate
+            
+            formatted_total_riel = "{:,.0f}".format(total_riel) if total_riel % 1 == 0 else "{:,.2f}".format(total_riel)
+            formatted_water_rate = "{:.2f}".format(water_rate) if isinstance(water_rate, (float, int)) else "{:,.2f}".format(float(water_rate.rate))
 
-        content_values = [str(monthly_fee.room.RoomNo),
-                          str(monthly_fee.room.HouseOwner.name),
-                          str(monthly_fee.date),
-                          f"{monthly_fee.previous_water} m³",
-                          f"{monthly_fee.current_water} m³",
-                          f"${monthly_fee.water_fee:.2f}",
-                          f"${monthly_fee.park_fee:.2f}",
-                          f"${monthly_fee.trash_fee:.2f}",
-                          f"${monthly_fee.room.RoomFee:.2f}",
-                          f"${monthly_fee.total:.2f} រឺ {formatted_total_riel}៛"
-                          ]
+            content_values = [
+                str(monthly_fee.room.RoomNo),
+                monthly_fee.date.strftime('%d-%m-%Y'),
+                f"{monthly_fee.previous_water} m³",
+                f"{monthly_fee.current_water} m³",
+                f"${formatted_water_rate}/m³",  # Include "/m³" in the water rate
+                "${:,.0f}".format(monthly_fee.water_fee),
+                "${:,.0f}".format(monthly_fee.park_fee),
+                "${:,.0f}".format(monthly_fee.trash_fee),
+                "${:,.0f}".format(monthly_fee.room.RoomFee),
+                "${:,.0f} រឺ {:,.0f} ៛".format(monthly_fee.total, total_riel),
+    ]
 
         # Iterate through labels and values to fill the table
         for row_index, (label, value) in enumerate(zip(content_labels, content_values)):
             table.cell(row_index, 0).text = label
             table.cell(row_index, 1).text = value
-            # Increase font size for content
-            table.cell(row_index, 0).paragraphs[0].runs[0].font.size = Pt(12)
-            table.cell(row_index, 1).paragraphs[0].runs[0].font.size = Pt(12)
-            # Set Khmer OS font for content
-            table.cell(row_index, 0).paragraphs[0].runs[0].font.name = 'Khmer OS'
-            table.cell(row_index, 1).paragraphs[0].runs[0].font.name = 'Khmer OS'
+            
+            # Adjust cell margins for padding
+            for cell in [table.cell(row_index, 0), table.cell(row_index, 1)]:
+                cell.paragraphs[0].runs[0].font.size = Pt(14)
+                cell.paragraphs[0].runs[0].font.name = 'Khmer OS Battambang'
+                cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+                cell.paragraphs[0].paragraph_format.space_after = Pt(10)  # Adjust the space after each paragraph for bottom padding
+                cell.paragraphs[0].paragraph_format.space_before = Pt(10)# Adjust the space after each paragraph for padding
             
 
     # Prepare the HTTP response with the Word document
@@ -743,33 +753,7 @@ def export_to_word(request, selected_month, selected_year):
     document.save(response)
 
     return response
-# class MonthlyFeeExportView(View):
-#     template_name = 'dashboard/monthly/monthly_fee_export_pdf.html'
 
-#     def get(self, request, *args, **kwargs):
-#         selected_month = request.GET.get('month')
-
-#         # Ensure selected_month is not empty
-#         if not selected_month:
-#             return HttpResponse('Please provide a valid month', status=400)
-
-#         # Fetch monthly fees based on the selected month
-#         monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month)
-
-#         template = get_template(self.template_name)
-#         context = {'monthly_fees': monthly_fees, 'selected_month': selected_month}
-#         html = template.render(context)
-
-#         # Create a PDF response
-#         response = HttpResponse(content_type='application/pdf')
-#         response['Content-Disposition'] = f'filename="monthly_rental_fee_{selected_month}.pdf"'
-
-#         # Generate PDF and write to the response
-#         pdf = pisa.CreatePDF(html, dest=response)
-#         if pdf.err:
-#             return HttpResponse('Error creating PDF', status=500)
-
-#         return response
 
 
 @login_required
@@ -787,94 +771,6 @@ def select_month_year(request):
         form = MonthYearForm(initial={'selected_month': initial_month, 'selected_year': initial_year})
 
     return render(request, 'dashboard/monthly/monthly_rental_fee.html', {'form': form})
-# @login_required
-# def export_to_pdf(request, selected_month, selected_year):
-#     font_path = os.path.join(settings.BASE_DIR, 'fonts', 'KhmerOS.ttf')
-
-#     # Register the Khmer font
-#     pdfmetrics.registerFont(TTFont('KhmerOS', font_path))
-
-#     # Retrieve the monthly fees based on the selected month and year
-#     monthly_fees = MonthlyRentalFee.objects.filter(date__month=selected_month, date__year=selected_year)
-
-#     # Create a file-like buffer to receive PDF data
-#     buffer = BytesIO()
-
-#     # Create the PDF object using the buffer as its "file"
-#     p = SimpleDocTemplate(buffer, pagesize=landscape(letter))
-
-#     # Set up the PDF document
-#     elements = []
-
-#     # Add a title above the table
-#     title_text = f"Monthly rental for {selected_month}/{selected_year}"
-#     title_style = getSampleStyleSheet()["Title"]
-#     title_style.fontName = 'KhmerOS'  # Set the font for the title
-#     title = Paragraph(title_text, title_style)
-#     elements.append(title)
-
-#     for i, monthly_fee in enumerate(monthly_fees):
-#         # Add a new page for each room except the first one
-#         if i > 0:
-#             elements.append(PageBreak())
-
-#         # Set up the PDF document for the new page
-#         data = []
-#         table_headers = [
-#             "Room No/លេខ​បន្ទប់",
-#             "House Owner/ម្ចាស់ផ្ទះ",
-#             "Date/កាលបរិច្ឆេទ",
-#             "Current Water/ទឹកប្រាក់បូល",
-#             "Previous Water/ទឹកប្រាក់មុន",
-#             "Water Fee/ថ្លឹងទឹក",
-#             "Room Fee/ថ្លឹងបន្ទប់",
-#             "Trash Fee/ថ្លឹងសំប៊ូរ",
-#             "Park Fee/ថ្លឹងជើងឡាន",
-#             "Total/សរុប"
-#         ]
-#         data.append(table_headers)
-
-#         data_row = [
-#             str(monthly_fee.room.RoomNo),
-#             str(monthly_fee.room.HouseOwner.name),
-#             str(monthly_fee.date),
-#             f"{monthly_fee.current_water} m³",
-#             f"{monthly_fee.previous_water} m³",
-#             f"${monthly_fee.water_fee:.2f}",
-#             f"${monthly_fee.room.RoomFee:.2f}",
-#             f"${monthly_fee.trash_fee:.2f}",
-#             f"${monthly_fee.park_fee:.2f}",
-#             f"${monthly_fee.total:.2f}"
-#         ]
-#         data.append(data_row)
-
-#         # Create the table and set style
-#         table = Table(data, colWidths=[100, 150, 80, 100, 100, 80, 80, 80, 80, 80])  # Adjust column widths as needed
-#         style = TableStyle([
-#             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-#             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-#             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-#             ('FONTNAME', (0, 0), (-1, 0), 'KhmerOS'),  # Set the font for the table headers
-#             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-#             ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-#             ('GRID', (0, 0), (-1, -1), 1, colors.black)
-#         ])
-
-#         table.setStyle(style)
-
-#         # Add the table to the elements for this page
-#         elements.append(table)
-
-#     # Build the PDF
-#     p.build(elements)
-
-#     # FileResponse sets the Content-Disposition header so that browsers
-#     # present the option to save the file.
-#     buffer.seek(0)
-#     response = HttpResponse(buffer, content_type='application/pdf')
-#     response['Content-Disposition'] = f'filename="monthly_rental_fee_report_{selected_month}_{selected_year}.pdf"'
-#     return response
-
 
 def room_pie_chart(request):
     available_count = room.objects.filter(status=room.AVAILABLE).count()
@@ -892,20 +788,16 @@ from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 
 def checkin_checkout_bar_chart(request):
-    current_year = datetime.now().year
+    current_month = timezone.now().month
+    current_year = timezone.now().year
 
-    checkin_data = CheckIn.objects.filter(date__year=current_year).annotate(month=ExtractMonth('date')).values('month').annotate(count=Count('id'))
-    checkout_data = CheckOut.objects.filter(date__year=current_year).annotate(month=ExtractMonth('date')).values('month').annotate(count=Count('id'))
-
-    months = [
-        datetime.strptime(f'{current_year}-{month}-1', '%Y-%m-%d').strftime('%B %Y')
-        for month in range(1, 13)
-    ]
+    checkin_data = CheckIn.objects.filter(date__year=current_year, date__month=current_month).count()
+    checkout_data = CheckOut.objects.filter(date__year=current_year, date__month=current_month).count()
 
     data = {
-        'labels': months,
-        'checkin': list(checkin_data),
-        'checkout': list(checkout_data),
+        'labels': [f'{current_month} {current_year}'],
+        'checkin': [{'count': checkin_data}],
+        'checkout': [{'count': checkout_data}],
     }
 
     return JsonResponse(data, safe=False)

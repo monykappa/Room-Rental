@@ -184,7 +184,7 @@ class WaterRate(models.Model):
     rate = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'Water Rate: ${self.rate} per unit'
+        return f'{self.rate}'
 
 class Utilities(models.Model):
     room = models.OneToOneField('room', on_delete=models.CASCADE, related_name='utilities')

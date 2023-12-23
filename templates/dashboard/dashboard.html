@@ -25,14 +25,15 @@ Dashboard
         </div>
 
         <div class="check-in-check-out-ctn">
-            <h2>Check in/out current month</h2>
+            <h2 id="currentMonthTitle"></h2>
             <div>
                 <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
             </div>
         </div>
+        
 
         <div class="check-in-check-out-ctn">
-            <h2>Room Check-in Chart</h2>
+            <h2>Room Check-in Count</h2>
         <div>
             <canvas id="roomCheckinChart" width="400" height="200"></canvas>
         </div>
@@ -99,9 +100,9 @@ Dashboard
                             maintainAspectRatio: false,
                             plugins: {
                                 datalabels: {
-                                    color: 'white', // Set label color
+                                    color: 'white',
                                     backgroundColor: function (context) {
-                                        return context.dataset.backgroundColor; // Match label background color with dataset color
+                                        return context.dataset.backgroundColor;
                                     },
                                     borderColor: 'transparent',
                                     borderRadius: 25,
@@ -112,12 +113,13 @@ Dashboard
                                     formatter: (value, context) => {
                                         return context.chart.data.labels[context.dataIndex] + '\n' + value;
                                     },
-                                    display: 'auto', // 'auto' will display labels by default
+                                    display: 'auto', // Change this to 'auto' or 'always'
                                 },
                             },
                         },
                     });
-                });
+                })
+                .catch(error => console.error('Error fetching data:', error));
         });
     </script>
     <script>
@@ -125,8 +127,18 @@ Dashboard
             fetch('/checkin_checkout_bar_chart/')
                 .then(response => response.json())
                 .then(data => {
-                    var ctx = document.getElementById('checkinCheckoutBarChart').getContext('2d');
-                    var myBarChart = new Chart(ctx, {
+                    // Get the current month name
+                    const currentMonthName = data.labels[0];
+        
+                    // Update the title with the current month
+                    document.getElementById('currentMonthTitle').textContent = `Check in/out for ${currentMonthName}`;
+        
+                    // Get the canvas element
+                    const canvas = document.getElementById('checkinCheckoutBarChart');
+                    const ctx = canvas.getContext('2d');
+        
+                    // Create the bar chart
+                    new Chart(ctx, {
                         type: 'bar',
                         data: {
                             labels: data.labels,
@@ -147,7 +159,7 @@ Dashboard
                             scales: {
                                 x: {
                                     ticks: {
-                                        fontSize: 14, 
+                                        fontSize: 14,
                                     },
                                 },
                                 y: {
@@ -160,8 +172,7 @@ Dashboard
                     });
                 });
         });
-
-
+        
     </script>
 
 

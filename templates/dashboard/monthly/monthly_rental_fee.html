@@ -23,10 +23,9 @@ Monthly Rental Fee
         
         <form method="get" action="{% url 'dashboard:monthly_fee' %}">
             {{ form.as_p }}
-            <a href="{% url 'dashboard:monthly_fee_pdf' selected_month=form.selected_month.value selected_year=form.selected_year.value %}"
-                class="btn btn-success btn-pdf btn-pdf">Export to PDF</a>
-            <a href="{% url 'dashboard:export_to_excel' selected_month=form.selected_month.value selected_year=form.selected_year.value %}"
-                class="btn btn-primary btn-excel">Export to Excel</a>
+            <!-- <!-- <a href="{% url 'dashboard:monthly_fee_pdf' selected_month=form.selected_month.value selected_year=form.selected_year.value %}" class="btn btn-success btn-pdf btn-pdf">Export to PDF</a> -->
+            <!-- <a href="{% url 'dashboard:export_to_excel' selected_month=form.selected_month.value selected_year=form.selected_year.value %}"
+                class="btn btn-primary btn-excel">Export to Excel</a>  -->
             <a href="{% url 'dashboard:export_to_word' selected_month=form.selected_month.value selected_year=form.selected_year.value %}"
                 class="btn btn-success btn-word">Export to Word</a>
             <button type="submit" class="btn btn-primary btn-filter">Filter</button>
@@ -50,6 +49,7 @@ Monthly Rental Fee
                 <th>Trash Fee</th>
                 <th>Park Fee</th>
                 <th>Total</th>
+
             </tr>
         </thead>
         <tbody>
@@ -78,31 +78,5 @@ Monthly Rental Fee
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.js"></script>
 
 
-<!-- <script>
-        $(document).ready(function () {
-            $("#export-pdf").on("click", function () {
-                // Select the table content
-                var element = document.getElementById('data-table');
-    
-                // Set the options for html2pdf
-                var opt = {
-                    margin:       10,
-                    filename:     'monthly_rental_fee.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2 },
-                    jsPDF:         { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-    
-                // Use html2pdf to generate the PDF
-                html2pdf().from(element).set(opt).outputPdf(function(pdf) {
-                    var blob = new Blob([pdf], { type: 'application/pdf' });
-                    var link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = 'monthly_rental_fee.pdf';
-                    link.click();
-                });
-            });
-        });
-    </script> -->
 
 {% endblock content %}

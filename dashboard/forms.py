@@ -109,6 +109,9 @@ class MonthlyRentalFeeForm(forms.ModelForm):
         self.fields['date'].initial = timezone.now().date()  # Set initial value to the current date
         self.room = room  # Store the room in the form
 
+        # Set a default value for the trash_fee field
+        self.fields['trash_fee'].initial = 1  # Change this value to your desired default
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.room = self.room
@@ -131,7 +134,7 @@ class MonthlyRentalFeeForm(forms.ModelForm):
         # Retrieve current water from Utilities
         utilities = Utilities.objects.get(room=self.room)
         return utilities.current_water
-    
+
 
 class MonthFilterForm(forms.Form):
     MONTH_CHOICES = [
@@ -149,7 +152,7 @@ class MonthFilterForm(forms.Form):
         (12, 'December'),
     ]
 
-    YEAR_CHOICES = [(year, str(year)) for year in range(2022, datetime.now().year + 2)]
+    YEAR_CHOICES = [(year, str(year)) for year in range(2023, datetime.now().year + 5)]
 
     selected_month = forms.ChoiceField(choices=MONTH_CHOICES, label='Select Month', required=False)
     selected_year = forms.ChoiceField(choices=YEAR_CHOICES, label='Select Year', required=False)

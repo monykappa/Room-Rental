@@ -52,17 +52,14 @@ urlpatterns = [
     #monthly
     path('monthly_fee/', views.monthly_fee, name='monthly_fee'),
     path('add_monthly_fee/', views.add_monthly_fee, name='add_monthly_fee'),
-    # path('export-pdf/', views.MonthlyFeeExportView.as_view(), name='export_pdf'),
+
     path('export_to_pdf/<int:selected_month>/<int:selected_year>/', views.export_to_pdf, name='monthly_fee_pdf'),
     path('export_to_excel/<int:selected_month>/<int:selected_year>/', views.export_to_excel, name='export_to_excel'),
     path('export_to_word/<int:selected_month>/<int:selected_year>/', views.export_to_word, name='export_to_word'),
-    # path('export_to_pdf/<int:selected_month>/<int:selected_year>/', views.export_to_pdf, name='monthly_fee_pdf'),
-    # path('monthly-fee-input/', views.monthly_fee_input, name='monthly_fee_input'),
-    # path('save-monthly-fee/', views.save_monthly_fee, name='save_monthly_fee'),
-    # path('invoice/<int:invoice_id>/', views.invoice_detail, name='invoice_detail'),
+
     
     
-    #Dashboad
+    #Dashboard
     path('room_pie_chart/', views.room_pie_chart, name='room_pie_chart'),
     path('checkin_checkout_bar_chart/', views.checkin_checkout_bar_chart, name='checkin_checkout_bar_chart'),
     path('room_checkin_chart/', views.room_checkin_chart, name='room_checkin_chart'),

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Edit Monthly Rental Fee
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/monthly/monthly_rental_fee.css' %}">
+{% endblock css %}
+
+{% block content %}
+<div class="monthly-rental-ctn">
+    <h1>Edit Monthly Rental Fee</h1>
+
+    <form method="post" action="{% url 'dashboard:edit_monthly_fee' monthly_fee.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger">Cancel</a>
+    </form>
+</div>
+{% endblock content %}
