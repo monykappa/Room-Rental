@@ -17,27 +17,27 @@ Dashboard
 
     <h1>Dashboard</h1>
     <div class="dashboard-ctn">
-        <div class="room-ctn">
+        <div class="room-ctn db-ctn">
             <h2>Room Rental Status</h2>
             <div>
                 <canvas id="roomPieChart" width="200" height="200"></canvas>
             </div>
         </div>
 
-        <div class="check-in-check-out-ctn">
+        <div class="check-in-check-out-ctn  db-ctn">
             <h2 id="currentMonthTitle"></h2>
             <div>
                 <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
             </div>
         </div>
-        
 
-        <div class="check-in-check-out-ctn">
+
+        <div class="check-in-check-out-ctn  db-ctn">
             <h2>Room Check-in Count</h2>
-        <div>
-            <canvas id="roomCheckinChart" width="400" height="200"></canvas>
+            <div>
+                <canvas id="roomCheckinChart" width="400" height="200"></canvas>
+            </div>
         </div>
-    </div>
 
     </div>
 
@@ -92,7 +92,7 @@ Dashboard
                             labels: data.labels,
                             datasets: [{
                                 data: data.data,
-                                backgroundColor: ['green', 'orange'],
+                                backgroundColor: ['green', 'red'],
                             }],
                         },
                         options: {
@@ -129,14 +129,14 @@ Dashboard
                 .then(data => {
                     // Get the current month name
                     const currentMonthName = data.labels[0];
-        
+
                     // Update the title with the current month
                     document.getElementById('currentMonthTitle').textContent = `Check in/out for ${currentMonthName}`;
-        
+
                     // Get the canvas element
                     const canvas = document.getElementById('checkinCheckoutBarChart');
                     const ctx = canvas.getContext('2d');
-        
+
                     // Create the bar chart
                     new Chart(ctx, {
                         type: 'bar',
@@ -172,7 +172,7 @@ Dashboard
                     });
                 });
         });
-        
+
     </script>
 
 

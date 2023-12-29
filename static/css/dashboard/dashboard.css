@@ -3,7 +3,11 @@ h1{
 }
 .dashboard-ctn{
     padding: 15px;
-    border:1px solid red;
     display: flex;
     justify-content: space-between;
+}
+.db-ctn{
+    border: 1px solid grey;
+    padding: 15px;
+    border-radius: 5px;
 }
