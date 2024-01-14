@@ -39,7 +39,7 @@ Client
         <tbody>
             {% for client in clients %}
             <tr{% if client.id == request.GET.id %} class="highlight"{% endif %}>
-                <td style="color:red; font-weight: 500;">{{ client.id }}</td>
+                <td style="color:red !important; font-weight: 500;">{{ client.id }}</td>
                 <td data-field="ClientName">{{ client.ClientName }}</td>
                 <td data-field="sex">{{ client.sex }}</td>
                 <td data-field="address">{{ client.address }}</td>

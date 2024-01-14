@@ -1,0 +1,144 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap/fonts/icomoon/style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap/owl.carousel.min.css' %}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href=" {% static 'css/bootstrap/bootstrap.min.css' %}">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block css %}{% endblock %}
+    <title>{% block title %}Base1{% endblock %}</title>
+</head>
+
+<style>
+
+</style>
+
+<body>
+
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close mt-3">
+
+                <span class="icon-close2 js-menu-toggle" style="color:red;"><img
+                        src="{% static 'img/icons8-close-64.png' %}"></span>
+            </div>
+    
+
+        </div>
+
+        <div class="site-mobile-menu-body">
+        </div>
+    </div>
+
+
+
+    <header class="site-navbar site-navbar-target py-4" role="banner">
+
+        <div class="container">
+            <div class="row align-items-center position-relative">
+
+                <div class="col-3">
+
+                    <div class="site-logo">
+                        <img src="{% static 'img/icons8-house-48.png' %}">
+                        <a href="{% url 'dashboard:dashboard' %}" class="font-weight-bold" style="color:black;">Room
+                            Rental</a>
+
+                    </div>
+                </div>
+
+                <div class="col-9  text-right">
+
+
+                    <span class="d-inline-block d-lg-block"><a href="#"
+                            class="text-black site-menu-toggle js-menu-toggle py-5"><span
+                                class="icon-menu h3 text-white"></span><img src="{% static 'img/icons8-menu-64.png' %}">
+                        </a></span>
+
+                    <nav class="site-navigation text-right ml-auto d-none d-lg-none" role="navigation">
+                        <ul class="site-menu main-menu js-clone-nav ml-auto ">
+                            <li><a href="{% url 'dashboard:dashboard' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-dashboard-25.png' %}">
+                                    <span class="link-name">Dahsboard / ផ្ទាំងគ្រប់គ្រង</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:CheckIn' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-check-in-25.png' %}">
+                                    <span class="link-name">Check-In / ថែ្ងចូល</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:CheckOut' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-check-out-25.png' %}">
+                                    <span class="link-name">Check-Out / ថែ្ងចេញ</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:room_list' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-room-25.png' %}">
+                                    <span class="link-name">Room / បន្ទប់</span>
+                                </a></li>
+
+                            <li><a href="{% url 'dashboard:house_owner' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-caretaker-25.png' %}">
+                                    <span class="link-name">House Owner / ម្ចាស់ផ្ទះ</span>
+                                </a></li>
+                            <li><a href="{% url 'dashboard:monthly_fee' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-calendar-plus-25.png' %}">
+                                    <span class="link-name">Monthly Fee / ថ្លៃ​សេវា​ប្រចាំ​ខែ</span>
+                                </a></li>
+                            <li><a href="{% url 'dashboard:client' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-client-25.png' %}">
+                                    <span class="link-name">Client / អតិថិជន</span>
+                                </a></li>
+                            <li><a href="{% url 'dashboard:other_fee' %}">
+                                    <img src="{% static 'img/menu-icon/icons8-other-25.png' %}">
+                                    <span class="link-name">Other Fee / ថ្លៃសេវាផ្សេងទៀត</span>
+                                </a></li>
+                                <div class="account-ctn">
+                                    <a href="" class="user">{{ request.user.username }}</a>
+                                    <a href="{% url 'dashboard:logout' %}" class="btn btn-danger text-white">Logout</a>
+                                </div>
+                        </ul>
+
+                    </nav>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </header>
+    <div class="ctn-content" style="left: 5%; right:5%; margin-top: 15vh; position: absolute;">
+
+        {% block content %}
+
+        {% endblock content %}
+    </div>
+
+
+
+    <script src=" {% static 'js/boostrap/jquery-3.3.1.min.js' %}"></script>
+    <script src=" {% static 'js/boostrap/popper.min.js' %}"></script>
+    <script src=" {% static 'js/boostrap/bootstrap.min.js' %}"></script>
+    <script src=" {% static 'js/boostrap/jquery.sticky.js' %}"></script>
+    <script src=" {% static 'js/boostrap/main.js' %}"></script>
+    {% block js %}
+    {% endblock js %}
+</body>
+
+</html>

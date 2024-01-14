@@ -35,3 +35,20 @@ tbody tr{
 tbody td{
     padding: 15px;
 }
+
+
+@media (max-width: 600px) {
+    table {
+        overflow-x: auto;
+        display: block;
+        width: 100%;
+        cursor: grab; 
+        user-select: none; 
+    }
+
+    th, td {
+        white-space: nowrap;
+        min-width: 100px; 
+        padding: 8px; 
+    }
+}

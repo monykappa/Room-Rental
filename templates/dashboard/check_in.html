@@ -10,38 +10,40 @@ Check-In / ថែ្ងចូល
 {% endblock title %}
 
 
-    {% block content %}
-    <div class="checkin-ctn">
-        <h2>Check-In List / បញ្ជីចុះឈ្មោះចូល </h2>
-        <a href="{% url 'dashboard:checkin_form' %}">
-            <button type="button" class="btn btn-primary btn-check-in" style="margin: 10px 0;"><img src="{% static 'img/icons8-add-25.png' %}"> Check-In / ចុះឈ្មោះ</button>
-        </a>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID / ល.រ</th>
-                    <th>Client Name / ឈ្មោះអតិថិជន</th>
-                    <th>Room No / លេខ​បន្ទប់</th>
-                    <th>House Owner / ម្ចាស់ផ្ទះ</th>
-                    <th>Room Price / តម្លៃបន្ទប់</th>
-                    <th>Date Check-In / បរិច្ឆេទថែ្ងចូល</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for checkin in CheckIn %}
-                    <tr>
-                        <td style="color:rgb(241, 0, 0); font-weight: 500;">{{ checkin.id }}</td>
-                        <td data-field="ClientName" >
-                            <a href="{% url 'dashboard:client-edit' pk=checkin.client_id %}" class="client-name">{{ checkin.client_name }}</a>
-                        </td>
-                        <td>{{ checkin.room.RoomNo }}</td>
-                        <td>{{ checkin.room.HouseOwner }}</td>
-                        <td>${{ checkin.room.RoomFee|stringformat:"g"  }}</td>
-                        <td>{{ checkin.date|date:"Y-m-d" }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    
-    {% endblock content %}
+{% block content %}
+<div class="checkin-ctn">
+    <h2>Check-In List / បញ្ជីចុះឈ្មោះចូល </h2>
+    <a href="{% url 'dashboard:checkin_form' %}">
+        <button type="button" class="btn btn-primary btn-check-in" style="margin: 10px 0;"><img
+                src="{% static 'img/icons8-add-25.png' %}"> Check-In / ចុះឈ្មោះ</button>
+    </a>
+    <table>
+        <thead>
+            <tr>
+                <th>ID / ល.រ</th>
+                <th>Client Name / ឈ្មោះអតិថិជន</th>
+                <th>Room No / លេខ​បន្ទប់</th>
+                <th>House Owner / ម្ចាស់ផ្ទះ</th>
+                <th>Room Price / តម្លៃបន្ទប់</th>
+                <th>Date Check-In / បរិច្ឆេទថែ្ងចូល</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for checkin in CheckIn %}
+            <tr>
+                <td style="color:rgb(241, 0, 0); font-weight: 500;">{{ checkin.id }}</td>
+                <td data-field="ClientName">
+                    <a href="{% url 'dashboard:client-edit' pk=checkin.client_id %}" class="client-name">{{ checkin.client_name }}</a>
+                </td>
+                <td>{{ checkin.room.RoomNo }}</td>
+                <td>{{ checkin.room.HouseOwner }}</td>
+                <td>${{ checkin.room.RoomFee|stringformat:"g" }}</td>
+                <td>{{ checkin.date|date:"Y-m-d" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock content %}

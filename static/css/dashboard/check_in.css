@@ -1,59 +1,72 @@
-
-.checkin-ctn{
-    width:100%;
+.checkin-ctn {
+    width: 100%;
     display: block;
     margin: auto;
     margin-top: 5vh;
 }
-table{
+
+table {
     margin: auto;
-    width:100%;
+    width: 100%;
     font-size: 18px;
-    
+
 }
-thead{
+
+thead {
     background-color: rgb(47, 11, 104);
     color: white;
 }
-tbody tr:nth-child(odd){
+
+tbody tr:nth-child(odd) {
     background-color: rgb(224, 213, 241);
-    
-}
-tbody tr:nth-child(even){
-    background-color: rgb(209, 185, 245);
-}
-thead th{
-    padding:15px;
-    border:1px solid #fff;
-}
-thead tr{
-    border:1px solid grey;
+
 }
 
-tbody tr{
-    border:1px solid grey;
-    padding:5px;
-    color:#000;
+tbody tr:nth-child(even) {
+    background-color: rgb(209, 185, 245);
 }
-tbody td{
+
+thead th {
+    padding: 15px;
+    border: 1px solid #fff;
+}
+
+thead tr {
+    border: 1px solid grey;
+}
+
+tbody tr {
+    border: 1px solid grey;
+    padding: 5px;
+    color: #000;
+}
+
+tbody td {
     padding: 15px;
 }
-button.btn-check-in{
+
+button.btn-check-in {
     background-color: green;
     border: none;
 }
-a.client-name{
-    color:#000;
+
+a.client-name {
+    color: #000;
     text-decoration: underline !important;
 }
-a.client-name:hover{
 
-    color:red;
+a.client-name:hover {
+
+    color: red;
     text-decoration: none !important;
 }
-tbody tr{
+
+tbody tr {
     transition: 0.3s ease;
 }
-tbody tr:hover{
-    transform: scale(1.03);
-}
+
+/* tbody tr:hover {
+    transform: scale(1.01);
+} */
+
+
