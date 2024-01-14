@@ -44,6 +44,7 @@ import os
 
 
 
+
 def signin_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -451,7 +452,7 @@ def monthly_fee(request):
 @login_required
 def add_monthly_fee(request):
     if request.method == 'POST':
-        forms = [MonthlyRentalFeeForm(room, request.POST, prefix=f'form-{room.id}') for room in Room.objects.all()]
+        forms = [MonthlyRentalFeeForm(room, request.POST, prefix=f'form-{room.id}') for room in room.objects.all()]
         if all(form.is_valid() for form in forms):
             for form in forms:
                 form.save()
@@ -718,7 +719,12 @@ def export_to_word(request, selected_month, selected_year):
             total_riel = monthly_fee.total * exchange_rate
             
             formatted_total_riel = "{:,.0f}".format(total_riel) if total_riel % 1 == 0 else "{:,.2f}".format(total_riel)
-            formatted_water_rate = "{:.2f}".format(water_rate) if isinstance(water_rate, (float, int)) else "{:,.2f}".format(float(water_rate.rate))
+            if water_rate is not None:
+                formatted_water_rate = "{:.2f}".format(water_rate.rate) if water_rate is not None else "N/A"
+
+            else:
+                formatted_water_rate = "N/A"  # Or any default value you want to use when water_rate is None
+
 
             content_values = [
                 str(monthly_fee.room.RoomNo),

@@ -49,11 +49,16 @@ button.btn-filter{
     height: 40px;
 }
 /* Default styles */
-a.btn-reset, .btn-excel, .btn-word, .btn-pdf{
+a.btn-reset, .btn-excel, .btn-word, .btn-pdf, .btn-filter, .btn-add {
     margin-left: 10px;
     height: 40px;
+    transition: transform 0.3s ease; /* Add a smooth transition */
 }
 
+/* Hover Effect */
+a.btn-reset:hover, .btn-excel:hover, .btn-word:hover, .btn-pdf:hover, .btn-filter:hover, .btn-add:hover {
+    transform: scale(1.1);
+}
 /* Responsive styles for screens smaller than 600px */
 @media (max-width: 600px) {
     a.btn-excel, .btn-word, .btn-pdf{

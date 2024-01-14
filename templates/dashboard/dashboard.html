@@ -9,38 +9,49 @@
 Dashboard
 {% endblock title %}
 
-<body>
+
     {% block content %}
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 
-    <h1>Dashboard</h1>
-    <div class="dashboard-ctn">
-        <div class="room-ctn db-ctn">
-            <h2>Room Rental Status</h2>
-            <div>
-                <canvas id="roomPieChart" width="200" height="200"></canvas>
+    <div class="container ctn">
+        <h1>Dashboard</h1>
+        <div class="row">
+    
+            <!-- Room Rental Status -->
+            <div class="col-md-6 custom-margin">
+                <div class="room-ctn db-ctn">
+                    <h2>Room Rental Status</h2>
+                    <div>
+                        <canvas id="roomPieChart" width="200" height="200"></canvas>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="check-in-check-out-ctn  db-ctn">
-            <h2 id="currentMonthTitle"></h2>
-            <div>
-                <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
+    
+            <!-- Check-in/Check-out Status -->
+            <div class="col-md-6 custom-margin">
+                <div class="check-in-check-out-ctn db-ctn">
+                    <h2 id="currentMonthTitle"></h2>
+                    <div>
+                        <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
             </div>
-        </div>
-
-
-        <div class="check-in-check-out-ctn  db-ctn">
-            <h2>Room Check-in Count</h2>
-            <div>
-                <canvas id="roomCheckinChart" width="400" height="200"></canvas>
+    
+            <!-- Room Check-in Count -->
+            <div class="col-md-6 custom-margin">
+                <div class="check-in-check-out-ctn db-ctn">
+                    <h2>Room Check-in Count</h2>
+                    <div>
+                        <canvas id="roomCheckinChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
             </div>
+    
         </div>
-
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             fetch('/room_checkin_chart/')
@@ -175,6 +186,7 @@ Dashboard
 
     </script>
 
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     {% endblock %}
-</body>

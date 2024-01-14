@@ -1,13 +1,13 @@
-h1{
-    color:black;
+.ctn{
+    text-align: center;
+    
 }
-.dashboard-ctn{
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
+.col-md-6{
+    border:1px solid rgba(0, 0, 0, 0.372);
+    padding: 5vh;
+
 }
-.db-ctn{
-    border: 1px solid grey;
-    padding: 15px;
-    border-radius: 5px;
+
+.custom-margin {
+    margin:0 0px 20px 0; /* You can adjust the margin as needed */
 }

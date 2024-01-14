@@ -52,9 +52,11 @@ class RoomForm(forms.ModelForm):
 
 
 class CheckInForm(forms.ModelForm):
+    sex = forms.ChoiceField(choices=Person.SEX_CHOICES, required=False, label='Sex / ភេទ', initial='')
+
     class Meta:
         model = CheckIn
-        fields = ['client_name', 'client_address', 'client_contact', 'room', 'date']
+        fields = ['client_name', 'sex', 'client_address', 'client_contact', 'room', 'date']
         labels = {
             'client_name': 'Client name / ឈ្មោះអតិថិជន',
             'client_address': 'Client address / អាសយដ្ឋានអតិថិជន',
@@ -62,21 +64,36 @@ class CheckInForm(forms.ModelForm):
             'room': 'Room / បន្ទប់',
             'date': 'Date / កាលបរិច្ឆេទ',
         }
-
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['room'].queryset = room.objects.filter(status=room.AVAILABLE)
+            super().__init__(*args, **kwargs)
+            self.fields['room'].queryset = room.objects.filter(status=room.AVAILABLE)
 
-        self.helper = FormHelper()
-        self.helper.form_class = 'form'
-        self.helper.label_class = 'font-weight-bold'
-        self.helper.layout = Layout(
-            Field('client_name', css_class='form-control mb-2'),
-            Field('client_address', css_class='form-control mb-2'),
-            Field('client_contact', css_class='form-control mb-2'),
-            Field('room', css_class='form-control mb-2'), 
-            Field('date', css_class='form-control mb-2'),
-        )
+            self.helper = FormHelper()
+            self.helper.form_class = 'form'
+            self.helper.label_class = 'font-weight-bold'
+            self.helper.layout = Layout(
+                Field('client_name', css_class='form-control mb-2'),
+                Field('sex', css_class='form-control mb-2'),
+                Field('client_address', css_class='form-control mb-2'),
+                Field('client_contact', css_class='form-control mb-2'),
+                Field('room', css_class='form-control mb-2'), 
+                Field('date', css_class='form-control mb-2'),
+            )
+            
+    def save(self, commit=True):
+        instance = super(CheckInForm, self).save(commit=False)
+        
+        # Get the associated Client instance
+        client_instance, created = Client.objects.get_or_create(ClientName=instance.client_name)
+        
+        # Update the 'sex' field in the Client instance
+        client_instance.sex = self.cleaned_data.get('sex', None)
+        client_instance.save()
+
+        if commit:
+            instance.save()
+        return instance
+
 
 
 class check_out_form(forms.ModelForm):
@@ -112,6 +129,10 @@ class MonthlyRentalFeeForm(forms.ModelForm):
         # Set a default value for the trash_fee field
         self.fields['trash_fee'].initial = 1  # Change this value to your desired default
 
+        # Set default value for the park_fee field
+        last_month_fee = self.get_last_month_park_fee()
+        self.fields['park_fee'].initial = int(last_month_fee) if int(last_month_fee) == last_month_fee else last_month_fee
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.room = self.room
@@ -134,6 +155,11 @@ class MonthlyRentalFeeForm(forms.ModelForm):
         # Retrieve current water from Utilities
         utilities = Utilities.objects.get(room=self.room)
         return utilities.current_water
+
+    def get_last_month_park_fee(self):
+        # Retrieve the park fee from the last month
+        last_month_instance = MonthlyRentalFee.objects.filter(room=self.room).order_by('-date').first()
+        return last_month_instance.park_fee if last_month_instance else 0
 
 
 class MonthFilterForm(forms.Form):

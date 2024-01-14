@@ -1,3 +1,4 @@
+
 .checkin-ctn{
     width:100%;
     display: block;
@@ -43,7 +44,16 @@ button.btn-check-in{
 }
 a.client-name{
     color:#000;
+    text-decoration: underline !important;
 }
 a.client-name:hover{
-    text-decoration: underline !important;
+
+    color:red;
+    text-decoration: none !important;
+}
+tbody tr{
+    transition: 0.3s ease;
+}
+tbody tr:hover{
+    transform: scale(1.03);
 }
