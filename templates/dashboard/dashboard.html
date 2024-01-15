@@ -10,183 +10,185 @@ Dashboard
 {% endblock title %}
 
 
-    {% block content %}
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 
-    <div class="container ctn">
-        <h1>Dashboard</h1>
-        <div class="row">
-    
-            <!-- Room Rental Status -->
-            <div class="col-md-6 custom-margin">
-                <div class="room-ctn db-ctn">
-                    <h2>Room Rental Status</h2>
-                    <div>
-                        <canvas id="roomPieChart" width="200" height="200"></canvas>
-                    </div>
+<div class="container ctn">
+    <h1>Dashboard</h1>
+    <h1>Total Number of Rooms: {{ rooms|length }}</h1>
+
+    <div class="row">
+
+        <!-- Room Rental Status -->
+        <div class="col-md-6 custom-margin">
+            <div class="room-ctn db-ctn">
+                <h2>Room Rental Status</h2>
+                <div>
+                    <canvas id="roomPieChart" width="200" height="200"></canvas>
                 </div>
             </div>
-    
-            <!-- Check-in/Check-out Status -->
-            <div class="col-md-6 custom-margin">
-                <div class="check-in-check-out-ctn db-ctn">
-                    <h2 id="currentMonthTitle"></h2>
-                    <div>
-                        <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Room Check-in Count -->
-            <div class="col-md-6 custom-margin">
-                <div class="check-in-check-out-ctn db-ctn">
-                    <h2>Room Check-in Count</h2>
-                    <div>
-                        <canvas id="roomCheckinChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-    
         </div>
+
+        <!-- Check-in/Check-out Status -->
+        <div class="col-md-6 custom-margin">
+            <div class="check-in-check-out-ctn db-ctn">
+                <h2 id="currentMonthTitle"></h2>
+                <div>
+                    <canvas id="checkinCheckoutBarChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Check-in Count -->
+        <div class="col-md-6 custom-margin">
+            <div class="check-in-check-out-ctn db-ctn">
+                <h2>Room Check-in Count</h2>
+                <div>
+                    <canvas id="roomCheckinChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/room_checkin_chart/')
-                .then(response => response.json())
-                .then(data => {
-                    var ctx = document.getElementById('roomCheckinChart').getContext('2d');
-                    var myBarChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Check-ins',
-                                data: data.checkin_count,
-                                backgroundColor: 'blue',
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                x: {
-                                    ticks: {
-                                        fontSize: 14,
-                                    },
-                                },
-                                y: {
-                                    ticks: {
-                                        fontSize: 14,
-                                    },
-                                    beginAtZero: true,
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/room_checkin_chart/')
+            .then(response => response.json())
+            .then(data => {
+                var ctx = document.getElementById('roomCheckinChart').getContext('2d');
+                var myBarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Check-ins',
+                            data: data.checkin_count,
+                            backgroundColor: 'blue',
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                ticks: {
+                                    fontSize: 14,
                                 },
                             },
-                        },
-                    });
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/room_pie_chart/')
-                .then(response => response.json())
-                .then(data => {
-                    var ctx = document.getElementById('roomPieChart').getContext('2d');
-                    var myPieChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                data: data.data,
-                                backgroundColor: ['green', 'red'],
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                datalabels: {
-                                    color: 'white',
-                                    backgroundColor: function (context) {
-                                        return context.dataset.backgroundColor;
-                                    },
-                                    borderColor: 'transparent',
-                                    borderRadius: 25,
-                                    font: {
-                                        weight: 'bold',
-                                        size: '12',
-                                    },
-                                    formatter: (value, context) => {
-                                        return context.chart.data.labels[context.dataIndex] + '\n' + value;
-                                    },
-                                    display: 'auto', // Change this to 'auto' or 'always'
+                            y: {
+                                ticks: {
+                                    fontSize: 14,
                                 },
+                                beginAtZero: true,
                             },
                         },
-                    });
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/checkin_checkout_bar_chart/')
-                .then(response => response.json())
-                .then(data => {
-                    // Get the current month name
-                    const currentMonthName = data.labels[0];
-
-                    // Update the title with the current month
-                    document.getElementById('currentMonthTitle').textContent = `Check in/out for ${currentMonthName}`;
-
-                    // Get the canvas element
-                    const canvas = document.getElementById('checkinCheckoutBarChart');
-                    const ctx = canvas.getContext('2d');
-
-                    // Create the bar chart
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: data.labels,
-                            datasets: [{
-                                label: 'Check-in',
-                                data: data.checkin.map(entry => entry.count),
-                                backgroundColor: 'green',
-                            },
-                            {
-                                label: 'Check-out',
-                                data: data.checkout.map(entry => entry.count),
-                                backgroundColor: 'orange',
-                            }],
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                x: {
-                                    ticks: {
-                                        fontSize: 14,
-                                    },
-                                },
-                                y: {
-                                    ticks: {
-                                        fontSize: 14,
-                                    },
-                                },
-                            },
-                        },
-                    });
+                    },
                 });
-        });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
 
-    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/room_pie_chart/')
+            .then(response => response.json())
+            .then(data => {
+                var ctx = document.getElementById('roomPieChart').getContext('2d');
+                var myPieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: ['green', 'red'],
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            datalabels: {
+                                color: 'white',
+                                backgroundColor: function (context) {
+                                    return context.dataset.backgroundColor;
+                                },
+                                borderColor: 'transparent',
+                                borderRadius: 25,
+                                font: {
+                                    weight: 'bold',
+                                    size: '12',
+                                },
+                                formatter: (value, context) => {
+                                    return context.chart.data.labels[context.dataIndex] + '\n' + value;
+                                },
+                                display: 'auto', // Change this to 'auto' or 'always'
+                            },
+                        },
+                    },
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/checkin_checkout_bar_chart/')
+            .then(response => response.json())
+            .then(data => {
+                // Get the current month name
+                const currentMonthName = data.labels[0];
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    {% endblock %}
+                // Update the title with the current month
+                document.getElementById('currentMonthTitle').textContent = `Check in/out for ${currentMonthName}`;
+
+                // Get the canvas element
+                const canvas = document.getElementById('checkinCheckoutBarChart');
+                const ctx = canvas.getContext('2d');
+
+                // Create the bar chart
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Check-in',
+                            data: data.checkin.map(entry => entry.count),
+                            backgroundColor: 'green',
+                        },
+                        {
+                            label: 'Check-out',
+                            data: data.checkout.map(entry => entry.count),
+                            backgroundColor: 'orange',
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                ticks: {
+                                    fontSize: 14,
+                                },
+                            },
+                            y: {
+                                ticks: {
+                                    fontSize: 14,
+                                },
+                            },
+                        },
+                    },
+                });
+            });
+    });
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}

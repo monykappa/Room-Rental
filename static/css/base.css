@@ -72,8 +72,14 @@ body {
     text-align: left;
     background-color: #fff;
 }
+form{
+    color:#000;
+}
+tbody tr td{
+    color:#000;
+}
 
-@media (max-width: 600px) {
+@media (max-width: 1100px) {
     table {
         overflow-x: auto;
         display: block;

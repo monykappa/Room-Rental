@@ -74,8 +74,9 @@ def base(request):
 
 @login_required
 def dashboard(request):
+    rooms = room.objects.all()
     template = 'dashboard/dashboard.html'
-    return render(request, template)
+    return render(request, template, {'rooms': rooms})
 
 @login_required
 def add_room(request):

@@ -31,9 +31,6 @@ Monthly Rental Fee
             <button type="submit" class="btn btn-primary btn-filter">Filter</button>
             <a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-danger btn-reset">Reset Filter</a>
         </form>
-
-
-
     </div>
 
     <table id="data-table">
@@ -61,7 +58,7 @@ Monthly Rental Fee
                 <td>{{ monthly_fee.date }}</td>
                 <td>{{ monthly_fee.current_water }} m³</td>
                 <td>{{ monthly_fee.previous_water }} m³</td>
-                <td>{{ monthly_fee.room.utilities.water_rate.rate }} m³</td>
+                <td>${{ monthly_fee.room.utilities.water_rate.rate }} / m³</td>
                 <td>${{ monthly_fee.water_fee|stringformat:"g" }}</td>
                 <td>${{ monthly_fee.room.RoomFee|stringformat:"g" }}</td>
                 <td>${{ monthly_fee.trash_fee|stringformat:"g" }}</td>

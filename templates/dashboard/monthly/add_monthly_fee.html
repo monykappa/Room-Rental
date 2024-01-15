@@ -62,7 +62,7 @@ Add Monthly Fee
     }
 </style>
 
-
+<a href="{% url 'dashboard:monthly_fee' %}" class="btn btn-primary">Go back</a>
 <form method="post" action="{% url 'dashboard:add_monthly_fee' %}">
     {% csrf_token %}
     <div class="add-monthly-ctn">

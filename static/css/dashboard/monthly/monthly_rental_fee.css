@@ -38,7 +38,11 @@ tbody td{
 
 .top-table-ctn {
     display: flex;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    flex-shrink: 1; /* Add this line */
 }
+
 
 .top-table-ctn form {
     margin-left: 10px;
@@ -76,4 +80,4 @@ a.btn-reset:hover, .btn-excel:hover, .btn-word:hover, .btn-pdf:hover, .btn-filte
         margin-left: 2px;
         height: 55px;
     }
-}
+} 
