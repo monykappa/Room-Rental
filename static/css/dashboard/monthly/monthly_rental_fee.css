@@ -1,0 +1,83 @@
+.check-out-ctn{
+    width:100%;
+    display: block;
+    margin: auto;
+    margin-top: 5vh;
+}
+table{
+    margin: auto;
+    width:100%;
+    font-size: 18px;
+    
+}
+thead{
+    background-color: rgb(47, 11, 104);
+    color: white;
+}
+tbody tr:nth-child(odd){
+    background-color: rgb(224, 213, 241);
+    
+}
+tbody tr:nth-child(even){
+    background-color: rgb(209, 185, 245);
+}
+thead th{
+    padding:15px;
+    border:1px solid #fff;
+}
+thead tr{
+    border:1px solid grey;
+}
+tbody tr{
+    border:1px solid grey;
+    padding:5px;
+}
+tbody td{
+    padding: 15px;
+}
+
+.top-table-ctn {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    flex-shrink: 1; /* Add this line */
+}
+
+
+.top-table-ctn form {
+    margin-left: 10px;
+    display: flex;
+}
+button.btn-filter{
+    margin-left: 10px;
+    height: 40px;
+}
+/* Default styles */
+a.btn-reset, .btn-excel, .btn-word, .btn-pdf, .btn-filter, .btn-add {
+    margin-left: 10px;
+    height: 40px;
+    transition: transform 0.3s ease; /* Add a smooth transition */
+}
+
+/* Hover Effect */
+a.btn-reset:hover, .btn-excel:hover, .btn-word:hover, .btn-pdf:hover, .btn-filter:hover, .btn-add:hover {
+    transform: scale(1.1);
+}
+/* Responsive styles for screens smaller than 600px */
+@media (max-width: 600px) {
+    a.btn-excel, .btn-word, .btn-pdf{
+        height: 90px;
+    }
+    a.btn-reset {
+        margin-left: 5px;
+        height: 60px;
+    }
+}
+
+/* Responsive styles for screens smaller than 400px */
+@media (max-width: 850px) {
+    a.btn-reset {
+        margin-left: 2px;
+        height: 55px;
+    }
+} 

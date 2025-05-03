@@ -1,0 +1,42 @@
+
+.room-ctn{
+    width:100%;
+    display: block;
+    margin: auto;
+    margin-top: 5vh;
+}
+table{
+    margin: auto;
+    margin-top: 2vh;
+    width:100%;
+    font-size: 18px;
+    
+}
+thead{
+    background-color: rgb(47, 11, 104);
+    color: white;
+}
+tbody tr:nth-child(odd){
+    background-color: rgb(224, 213, 241);
+    
+}
+tbody tr:nth-child(even){
+    background-color: rgb(209, 185, 245);
+}
+thead th{
+    padding:15px;
+    border:1px solid #fff;
+}
+thead tr{
+    border:1px solid grey;
+}
+tbody tr{
+    border:1px solid grey;
+    padding:5px;
+}
+tbody td{
+    padding: 15px;
+    color:#000;
+}
+
+
